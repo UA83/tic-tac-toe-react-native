@@ -215,8 +215,8 @@ export default function TicTacToeScreen() {
             <ThemedText style={styles.dangerButtonText}>RESET ALL</ThemedText>
           </TouchableOpacity>
         </View>
-        <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
       </Animated.View>
+      <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
 
       {winner && winner !== 'Draw' && (
         <Animated.View
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
-    marginTop: 15,
+    marginTop: 25,
     gap: 16,
     width: GRID_SIZE,
   },
@@ -463,8 +463,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   version: {
-    marginTop: 15,
-    marginBottom: 20,
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
     fontSize: 10,
     color: '#475569',
     fontWeight: '700',
