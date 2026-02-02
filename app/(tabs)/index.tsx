@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
 import { Animated, Dimensions, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
