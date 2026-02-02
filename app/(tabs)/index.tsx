@@ -1,7 +1,17 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-
-import { Animated, Dimensions, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Circle, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  ScaleInCenter,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring
+} from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,10 +19,12 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 
 const { width } = Dimensions.get('window');
 const GRID_SIZE = Math.min(width * 0.9, 400);
-const BOARD_PADDING = 12;
-const SQUARE_GAP = 8;
+const BOARD_PADDING = 16;
+const SQUARE_GAP = 12;
 const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2);
 const SQUARE_SIZE = (USABLE_WIDTH - (SQUARE_GAP * 2)) / 3;
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function TicTacToeScreen() {
   const packageJson = require('../../package.json');
@@ -21,16 +33,9 @@ export default function TicTacToeScreen() {
   const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
   const [lastWinner, setLastWinner] = useState<string | null>(null);
   const [, setStarter] = useState<'X' | 'O'>('X');
-  const popAnim = React.useRef(new Animated.Value(0)).current;
 
   const tintColor = useThemeColor({}, 'tint');
-
-  // Material 3 Color Tokens
-  const surfaceVariant = useThemeColor({ light: '#E0E2EC', dark: '#43474E' }, 'background');
-  const onSurface = useThemeColor({ light: '#191C1E', dark: '#E2E2E6' }, 'text');
-  const primaryColor = tintColor; // Dodger Blue #1E90FF
-  const secondaryContainer = useThemeColor({ light: '#D1E4FF', dark: '#004977' }, 'background');
-  const onSecondaryContainer = useThemeColor({ light: '#001D36', dark: '#D1E4FF' }, 'text');
+  const boardScale = useSharedValue(1);
 
   const calculateWinner = (squares: (string | null)[]) => {
     const lines = [
@@ -76,12 +81,17 @@ export default function TicTacToeScreen() {
         setScores(s => ({ ...s, [winPlayer as 'X' | 'O']: s[winPlayer as 'X' | 'O'] + 1 }));
         setLastWinner(winPlayer);
       }
+      // Victory/Draw shake
+      boardScale.value = withSequence(
+        withSpring(1.05),
+        withSpring(1)
+      );
     }
 
     setXIsNext(!xIsNext);
   };
 
-  const resetGame = React.useCallback(() => {
+  const resetGame = useCallback(() => {
     setBoard(Array(9).fill(null));
     if (lastWinner) {
       setXIsNext(lastWinner === 'X');
@@ -95,30 +105,14 @@ export default function TicTacToeScreen() {
     }
   }, [lastWinner]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (winner) {
-      if (winner !== 'Draw') {
-        Animated.spring(popAnim, {
-          toValue: 1,
-          useNativeDriver: true,
-          tension: 50,
-          friction: 7,
-        }).start();
-      }
-
       const timer = setTimeout(() => {
         resetGame();
-      }, 2000);
-      return () => {
-        clearTimeout(timer);
-        Animated.timing(popAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }).start();
-      };
+      }, 2500);
+      return () => clearTimeout(timer);
     }
-  }, [winner, resetGame, popAnim]);
+  }, [winner, resetGame]);
 
   const resetScoreboard = () => {
     setScores({ X: 0, O: 0, Draws: 0 });
@@ -127,116 +121,134 @@ export default function TicTacToeScreen() {
     resetGame();
   };
 
+  const boardAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: boardScale.value }]
+  }));
+
   const renderSquare = (index: number) => {
     const isWinSquare = winLine?.includes(index);
+    const value = board[index];
 
     return (
-      <TouchableOpacity
+      <Pressable
         key={index}
-        style={[
+        onPress={() => handlePress(index)}
+        style={({ pressed }) => [
           styles.square,
-          { width: SQUARE_SIZE, height: SQUARE_SIZE },
+          {
+            width: SQUARE_SIZE,
+            height: SQUARE_SIZE,
+            opacity: pressed ? 0.8 : 1,
+            transform: [{ scale: pressed ? 0.95 : 1 }]
+          },
           isWinSquare && styles.winSquare
         ]}
-        onPress={() => handlePress(index)}
-        activeOpacity={0.7}
       >
-        {board[index] === 'X' && (
-          <MaterialCommunityIcons
-            name="close"
-            size={SQUARE_SIZE * 0.7}
-            color={isWinSquare ? '#FFF' : '#FF474D'}
-          />
+        {value === 'X' && (
+          <Animated.View entering={ScaleInCenter.springify()}>
+            <X
+              size={SQUARE_SIZE * 0.6}
+              color={isWinSquare ? '#FFFFFF' : '#FF474D'}
+              strokeWidth={3}
+            />
+          </Animated.View>
         )}
-        {board[index] === 'O' && (
-          <MaterialCommunityIcons
-            name="circle-outline"
-            size={SQUARE_SIZE * 0.6}
-            color={isWinSquare ? '#FFF' : '#4579FF'}
-          />
+        {value === 'O' && (
+          <Animated.View entering={ScaleInCenter.springify()}>
+            <Circle
+              size={SQUARE_SIZE * 0.55}
+              color={isWinSquare ? '#FFFFFF' : '#1E90FF'}
+              strokeWidth={3}
+            />
+          </Animated.View>
         )}
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
   return (
     <ThemedView style={styles.container}>
+      <LinearGradient
+        colors={['#0F172A', '#1E293B', '#0F172A']}
+        style={StyleSheet.absoluteFill}
+      />
 
-      <View style={styles.header}>
-        <ThemedText style={styles.title}>Tic Tac Toe</ThemedText>
+      {/* Decorative ambient glows */}
+      <View style={[styles.glow, { top: -100, left: -50, backgroundColor: '#1E90FF22' }]} />
+      <View style={[styles.glow, { bottom: -100, right: -50, backgroundColor: '#FF880011' }]} />
 
-        <View style={[styles.scoreboard, { backgroundColor: surfaceVariant }]}>
-          <View style={styles.scoreItem}>
-            <ThemedText style={[styles.scoreLabel, { color: onSurface }]}>X</ThemedText>
-            <ThemedText style={[styles.scoreValue, { color: onSurface }]}>{scores.X}</ThemedText>
+      <Animated.View
+        entering={FadeInDown.duration(800).delay(200)}
+        style={styles.content}
+      >
+        <View style={styles.header}>
+          <ThemedText style={styles.title}>TIC TAC TOE</ThemedText>
+          <ThemedText style={styles.subtitle}>NEXT GEN 2026</ThemedText>
+        </View>
+
+        <View style={styles.glassScoreboard}>
+          <View style={styles.scoreBox}>
+            <ThemedText style={[styles.scoreLabel, { color: '#FF474D' }]}>PLAYER X</ThemedText>
+            <ThemedText style={styles.scoreNumber}>{scores.X}</ThemedText>
           </View>
-          <View style={styles.scoreSeparator} />
-          <View style={styles.scoreItem}>
-            <ThemedText style={[styles.scoreLabel, { color: onSurface }]}>Draws</ThemedText>
-            <ThemedText style={[styles.scoreValue, { color: onSurface }]}>{scores.Draws}</ThemedText>
+          <View style={styles.scoreDivider} />
+          <View style={styles.scoreBox}>
+            <ThemedText style={styles.scoreLabel}>DRAWS</ThemedText>
+            <ThemedText style={styles.scoreNumber}>{scores.Draws}</ThemedText>
           </View>
-          <View style={styles.scoreSeparator} />
-          <View style={styles.scoreItem}>
-            <ThemedText style={[styles.scoreLabel, { color: onSurface }]}>O</ThemedText>
-            <ThemedText style={[styles.scoreValue, { color: onSurface }]}>{scores.O}</ThemedText>
+          <View style={styles.scoreDivider} />
+          <View style={styles.scoreBox}>
+            <ThemedText style={[styles.scoreLabel, { color: '#1E90FF' }]}>PLAYER O</ThemedText>
+            <ThemedText style={styles.scoreNumber}>{scores.O}</ThemedText>
           </View>
         </View>
 
-        <View style={[styles.statusBadge, { backgroundColor: secondaryContainer }]}>
-          <ThemedText style={[styles.statusText, { color: onSecondaryContainer }]}>
-            {status}
-          </ThemedText>
+        <View style={styles.statusContainer}>
+          <View style={[styles.indicator, { backgroundColor: xIsNext ? '#FF474D' : '#1E90FF' }]} />
+          <ThemedText style={styles.statusText}>{status}</ThemedText>
         </View>
-      </View>
 
-      <View style={[styles.board, { width: GRID_SIZE, height: GRID_SIZE, padding: BOARD_PADDING }]}>
-        <View style={[styles.gridContainer, { gap: SQUARE_GAP }]}>
-          {Array(9).fill(null).map((_, i) => renderSquare(i))}
+        <Animated.View style={[styles.boardContainer, boardAnimatedStyle]}>
+          <View style={[styles.board, { width: GRID_SIZE, height: GRID_SIZE, padding: BOARD_PADDING }]}>
+            <View style={[styles.grid, { gap: SQUARE_GAP }]}>
+              {Array(9).fill(null).map((_, i) => renderSquare(i))}
+            </View>
+          </View>
+        </Animated.View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.glassButton} onPress={resetGame}>
+            <RotateCcw size={20} color="#FFF" />
+            <ThemedText style={styles.buttonText}>NEW ROUND</ThemedText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
+            <Trash2 size={20} color="#FF474D" />
+            <ThemedText style={[styles.buttonText, { color: '#FF474D' }]}>RESET ALL</ThemedText>
+          </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: primaryColor }]}
-          onPress={resetGame}
-          activeOpacity={0.8}
-        >
-          <ThemedText style={styles.buttonText}>Reset Game</ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: primaryColor }]}
-          onPress={resetScoreboard}
-          activeOpacity={0.8}
-        >
-          <ThemedText style={styles.buttonText}>Reset Score</ThemedText>
-        </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {winner && winner !== 'Draw' && (
-        <View style={styles.overlayContainer} pointerEvents="none">
-          <Animated.View
-            style={[
-              styles.winCard,
-              {
-                transform: [{ scale: popAnim }],
-                opacity: popAnim,
-              }
-            ]}
+        <Animated.View
+          entering={FadeIn.duration(400)}
+          exiting={FadeOut.duration(400)}
+          style={styles.victoryOverlay}
+        >
+          <LinearGradient
+            colors={['rgba(30, 144, 255, 0.95)', 'rgba(15, 23, 42, 0.98)']}
+            style={styles.victoryGradient}
           >
-            <MaterialCommunityIcons
-              name="trophy"
-              size={100}
-              color="#FFD700"
-              style={styles.trophyIcon}
-            />
-            <ThemedText style={styles.winTitle}>VICTORY!</ThemedText>
-            <ThemedText style={styles.winMessage}>Player {winner} wins</ThemedText>
-          </Animated.View>
-        </View>
+            <Animated.View entering={ScaleInCenter.delay(200).springify()}>
+              <Trophy size={120} color="#FFD700" strokeWidth={1.5} />
+            </Animated.View>
+            <ThemedText style={styles.victoryTitle}>VICTORY</ThemedText>
+            <ThemedText style={styles.victorySubtitle}>PLAYER {winner} DOMINATES</ThemedText>
+          </LinearGradient>
+        </Animated.View>
       )}
 
-      <ThemedText style={styles.versionText}>v{packageJson.version}</ThemedText>
+      <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
     </ThemedView>
   );
 }
@@ -244,71 +256,115 @@ export default function TicTacToeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0F172A',
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: 80, // Push content upwards
-    backgroundColor: '#F8F9FF', // Cool Light Surface
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+  },
+  glow: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    opacity: 0.5,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 16,
-    letterSpacing: -0.5,
-    fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-medium' }),
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#FFF',
+    letterSpacing: 8,
+    fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-black' }),
   },
-  scoreboard: {
+  subtitle: {
+    fontSize: 12,
+    color: '#1E90FF',
+    letterSpacing: 4,
+    fontWeight: '600',
+    marginTop: -4,
+  },
+  glassScoreboard: {
     flexDirection: 'row',
-    borderRadius: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 24,
     padding: 20,
-    marginBottom: 24,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     width: GRID_SIZE,
     justifyContent: 'space-between',
+    marginBottom: 30,
   },
-  scoreItem: {
+  scoreBox: {
     alignItems: 'center',
     flex: 1,
   },
   scoreLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    opacity: 0.7,
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#94A3B8',
+    letterSpacing: 1,
     marginBottom: 4,
   },
-  scoreValue: {
-    fontSize: 22,
+  scoreNumber: {
+    fontSize: 24,
     fontWeight: '700',
+    color: '#F8FAFC',
   },
-  scoreSeparator: {
+  scoreDivider: {
     width: 1,
-    height: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    height: '60%',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignSelf: 'center',
   },
-  statusBadge: {
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 12,
-    marginBottom: 24,
+    borderRadius: 100,
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 10,
+    shadowColor: '#FFF',
+    shadowRadius: 10,
+    shadowOpacity: 0.5,
   },
   statusText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    color: '#CBD5E1',
+    letterSpacing: 1,
     textTransform: 'uppercase',
   },
+  boardContainer: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.5,
+    shadowRadius: 30,
+    elevation: 20,
+  },
   board: {
-    borderRadius: 32,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
-  gridContainer: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
@@ -317,95 +373,77 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   square: {
-    backgroundColor: '#FAF9FB',
-    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   winSquare: {
     backgroundColor: '#1E90FF',
+    borderColor: '#38BDF8',
+    elevation: 10,
+    shadowColor: '#1E90FF',
+    shadowRadius: 20,
+    shadowOpacity: 0.5,
   },
-  buttonContainer: {
+  buttonRow: {
     flexDirection: 'row',
     marginTop: 40,
-    gap: 15,
+    gap: 16,
     width: GRID_SIZE,
   },
-  actionButton: {
+  glassButton: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 16,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    height: 56,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: 'rgba(0,0,0,0.2)',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      }
-    }),
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  dangerButton: {
+    borderColor: 'rgba(255, 71, 77, 0.2)',
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '800',
     color: '#FFF',
-    letterSpacing: 0.1,
+    letterSpacing: 1.2,
   },
-  overlayContainer: {
+  victoryOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
     zIndex: 1000,
   },
-  winCard: {
-    backgroundColor: '#EEF1FB', // Light Blue Surface
-    padding: 32,
-    borderRadius: 28,
+  victoryGradient: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    width: width * 0.85,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'rgba(0,0,0,0.3)',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 1,
-        shadowRadius: 16,
-      },
-      android: {
-        elevation: 10,
-      },
-      web: {
-        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-      }
-    }),
   },
-  trophyIcon: {
-    marginBottom: 16,
+  victoryTitle: {
+    fontSize: 56,
+    fontWeight: '900',
+    color: '#FFF',
+    letterSpacing: 12,
+    marginTop: 20,
   },
-  winTitle: {
-    fontSize: 32,
+  victorySubtitle: {
+    fontSize: 16,
+    color: '#FFD700',
     fontWeight: '700',
-    color: '#001D36',
-    letterSpacing: 0.5,
-    marginBottom: 8,
+    letterSpacing: 4,
+    textTransform: 'uppercase',
   },
-  winMessage: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#49454F',
-  },
-  versionText: {
+  version: {
     position: 'absolute',
-    bottom: 10,
-    fontSize: 12,
-    opacity: 0.3,
-    fontWeight: '600',
-  },
+    bottom: 20,
+    fontSize: 10,
+    color: '#475569',
+    fontWeight: '700',
+    letterSpacing: 1,
+  }
 });
