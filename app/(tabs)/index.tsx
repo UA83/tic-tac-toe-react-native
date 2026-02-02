@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Circle, Handshake, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, Modal, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, Platform, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -35,6 +35,8 @@ export default function TicTacToeScreen() {
   const [playerColors, setPlayerColors] = useState({ X: '#FF474D', O: '#1E90FF' });
   const [showColorPicker, setShowColorPicker] = useState<'X' | 'O' | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [playerNames, setPlayerNames] = useState({ X: 'Player X', O: 'Player O' });
+  const [tempPlayerName, setTempPlayerName] = useState('');
   const [, setStarter] = useState<'X' | 'O'>('X');
 
   const colorPalette = [
@@ -227,7 +229,7 @@ export default function TicTacToeScreen() {
 
         <View style={styles.glassScoreboard}>
           <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('X')}>
-            <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]}>PLAYER X</ThemedText>
+            <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]}>{playerNames.X}</ThemedText>
             <ThemedText style={styles.scoreNumber}>{scores.X}</ThemedText>
           </TouchableOpacity>
           <View style={styles.scoreDivider} />
@@ -237,7 +239,7 @@ export default function TicTacToeScreen() {
           </View>
           <View style={styles.scoreDivider} />
           <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('O')}>
-            <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]}>PLAYER O</ThemedText>
+            <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]}>{playerNames.O}</ThemedText>
             <ThemedText style={styles.scoreNumber}>{scores.O}</ThemedText>
           </TouchableOpacity>
         </View>
@@ -283,7 +285,7 @@ export default function TicTacToeScreen() {
               <Trophy size={120} color="#FFD700" strokeWidth={1.5} />
             </Animated.View>
             <ThemedText style={styles.victoryTitle}>VICTORY</ThemedText>
-            <ThemedText style={styles.victorySubtitle}>PLAYER {winner} DOMINATES</ThemedText>
+            <ThemedText style={styles.victorySubtitle}>{playerNames[winner as 'X' | 'O']} DOMINATES</ThemedText>
           </LinearGradient>
         </Animated.View>
       )}
@@ -320,8 +322,24 @@ export default function TicTacToeScreen() {
         >
           <Pressable style={styles.colorPickerContainer} onPress={(e) => e.stopPropagation()}>
             <ThemedText style={styles.colorPickerTitle}>
-              Choose Color for Player {showColorPicker}
+              Customize Player {showColorPicker}
             </ThemedText>
+
+            {/* Name Input */}
+            <View style={styles.nameInputContainer}>
+              <ThemedText style={styles.inputLabel}>Player Name:</ThemedText>
+              <TextInput
+                style={styles.nameInput}
+                value={tempPlayerName}
+                onChangeText={setTempPlayerName}
+                placeholder={playerNames[showColorPicker as 'X' | 'O']}
+                placeholderTextColor="#94A3B8"
+                maxLength={15}
+              />
+            </View>
+
+            {/* Color Selection */}
+            <ThemedText style={styles.inputLabel}>Choose Color:</ThemedText>
             <View style={styles.colorGrid}>
               {colorPalette.map((color) => {
                 const otherPlayer = showColorPicker === 'X' ? 'O' : 'X';
@@ -341,9 +359,13 @@ export default function TicTacToeScreen() {
                       if (showColorPicker) {
                         if (isColorTaken) {
                           const otherPlayerName = showColorPicker === 'X' ? 'O' : 'X';
-                          setToastMessage(`This color is already taken by Player ${otherPlayerName}!`);
+                          setToastMessage(`This color is already taken by ${playerNames[otherPlayerName]}!`);
                         } else {
                           setPlayerColors(prev => ({ ...prev, [showColorPicker]: color }));
+                          if (tempPlayerName.trim()) {
+                            setPlayerNames(prev => ({ ...prev, [showColorPicker]: tempPlayerName.trim() }));
+                          }
+                          setTempPlayerName('');
                           setShowColorPicker(null);
                         }
                       }
@@ -687,11 +709,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     alignSelf: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: '#fff',
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: '#361e1eff',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -699,9 +721,29 @@ const styles = StyleSheet.create({
     zIndex: 2000,
   },
   toastText: {
-    color: '#FFFFFF',
+    color: '#000',
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  nameInputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0F172A',
+    marginBottom: 8,
+  },
+  nameInput: {
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#0F172A',
+    fontWeight: '500',
   },
 });
