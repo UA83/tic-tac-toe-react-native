@@ -162,7 +162,7 @@ export default function TicTacToeScreen() {
   return (
     <ThemedView style={styles.container}>
 
-      <View style={[styles.header, { marginTop: Platform.OS === 'web' ? 20 : 40 }]}>
+      <View style={styles.header}>
         <ThemedText style={styles.title}>Tic Tac Toe</ThemedText>
 
         <View style={[styles.scoreboard, { backgroundColor: surfaceVariant }]}>
@@ -245,8 +245,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     padding: 20,
+    paddingTop: Platform.OS === 'web' ? 40 : 80,
     backgroundColor: '#FDF7FF', // M3 Surface
   },
   header: {
