@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
+
 import { Animated, Dimensions, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -249,7 +249,7 @@ export default function TicTacToeScreen() {
         </View>
       )}
 
-      <ThemedText style={styles.versionText}>v{Constants.expoConfig?.version}</ThemedText>
+      <ThemedText style={styles.versionText}>v{packageJson.version}</ThemedText>
     </ThemedView>
   );
 }
