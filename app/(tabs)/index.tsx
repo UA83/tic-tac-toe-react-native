@@ -110,12 +110,12 @@ export default function TicTacToeScreen() {
 
       const timer = setTimeout(() => {
         resetGame();
-      }, 3000);
+      }, 2000);
       return () => {
         clearTimeout(timer);
         Animated.timing(popAnim, {
           toValue: 0,
-          duration: 200,
+          duration: 2000,
           useNativeDriver: true,
         }).start();
       };
