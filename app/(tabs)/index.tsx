@@ -205,11 +205,11 @@ export default function TicTacToeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: secondaryContainer }]}
+          style={[styles.actionButton, { backgroundColor: primaryColor }]}
           onPress={resetScoreboard}
           activeOpacity={0.8}
         >
-          <ThemedText style={[styles.buttonText, { color: onSecondaryContainer }]}>Reset Score</ThemedText>
+          <ThemedText style={styles.buttonText}>Reset Score</ThemedText>
         </TouchableOpacity>
       </View>
 
