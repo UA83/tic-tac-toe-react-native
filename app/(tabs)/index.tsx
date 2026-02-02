@@ -180,7 +180,6 @@ export default function TicTacToeScreen() {
       >
         <View style={styles.header}>
           <ThemedText style={styles.title}>TIC TAC TOE</ThemedText>
-          <ThemedText style={styles.subtitle}>NEXT GEN 2026</ThemedText>
         </View>
 
         <View style={styles.glassScoreboard}>
@@ -277,6 +276,9 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     letterSpacing: 8,
     fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-black' }),
+    lineHeight: 52,
+    paddingVertical: 10,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 12,
