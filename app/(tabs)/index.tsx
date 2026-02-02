@@ -23,7 +23,6 @@ export default function TicTacToeScreen() {
   const [, setStarter] = useState<'X' | 'O'>('X');
   const popAnim = React.useRef(new Animated.Value(0)).current;
 
-  const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
 
   // Material 3 Color Tokens
