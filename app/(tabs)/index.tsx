@@ -220,7 +220,7 @@ export default function TicTacToeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
-            <Trash2 size={20} color="#FF474D" />
+            <Trash2 size={20} color="#FFF" />
             <ThemedText style={styles.dangerButtonText}>RESET ALL</ThemedText>
           </TouchableOpacity>
         </View>
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   board: {
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 40,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: 'rgba(30, 144, 255, 0.1)',
     justifyContent: 'center',
@@ -375,17 +375,19 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   square: {
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF', // Solid white so they all look the same
+    borderRadius: 15,          // Rounded corners for the "Next Gen" look
     alignItems: 'center',
     justifyContent: 'center',
+    width: 80,                 // Ensure fixed dimensions
+    height: 80,
     borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.05)',
-    shadowColor: '#000',
+    borderColor: '#E0E0E0',    // Suble but visible border
+    elevation: 4,              // Better shadow for Android
+    shadowColor: '#000',       // Shadow for iOS
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
   },
   winSquare: {
     backgroundColor: '#1E90FF',
@@ -434,9 +436,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
   dangerButton: {
-    backgroundColor: 'transparent',
-    borderColor: 'rgba(255, 71, 77, 0.4)',
-    borderWidth: 2,
+    backgroundColor: '#FF474D',
+    borderColor: '#FF474D',
+    shadowColor: '#FF474D',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 4,
   },
   buttonText: {
     fontSize: 14,
@@ -447,7 +453,7 @@ const styles = StyleSheet.create({
   dangerButtonText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#FF474D',
+    color: '#FFF',
     letterSpacing: 1.2,
   },
   victoryOverlay: {
