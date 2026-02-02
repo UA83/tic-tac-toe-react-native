@@ -225,6 +225,7 @@ export default function TicTacToeScreen() {
             <ThemedText style={[styles.buttonText, { color: '#FF474D' }]}>RESET ALL</ThemedText>
           </TouchableOpacity>
         </View>
+        <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
       </Animated.View>
 
       {winner && winner !== 'Draw' && (
@@ -246,7 +247,6 @@ export default function TicTacToeScreen() {
         </Animated.View>
       )}
 
-      <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
     </ThemedView>
   );
 }
@@ -440,8 +440,8 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   version: {
-    position: 'absolute',
-    bottom: 20,
+    marginTop: 30,
+    marginBottom: 20,
     fontSize: 10,
     color: '#475569',
     fontWeight: '700',
