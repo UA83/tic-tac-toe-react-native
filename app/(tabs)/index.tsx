@@ -165,14 +165,6 @@ export default function TicTacToeScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#FFFFFF', '#E0F2FE', '#F8FAFC']}
-        style={StyleSheet.absoluteFill}
-      />
-
-      {/* Decorative ambient glows */}
-      <View style={[styles.glow, { top: -100, left: -50, backgroundColor: '#1E90FF15' }]} />
-      <View style={[styles.glow, { bottom: -100, right: -50, backgroundColor: '#FF880008' }]} />
 
       <Animated.View
         entering={FadeInDown.duration(800).delay(200)}
@@ -252,23 +244,16 @@ export default function TicTacToeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-  },
-  glow: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    opacity: 0.5,
+    paddingTop: Platform.OS === 'ios' ? 40 : 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 15,
   },
   title: {
     fontSize: 42,
@@ -280,23 +265,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 12,
-    color: '#1E90FF',
-    letterSpacing: 4,
-    fontWeight: '600',
-    marginTop: -4,
-  },
   glassScoreboard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF', // Solid opaque white for Android/Web consistency
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: 10,
+    padding: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0', // Solid light border
     width: GRID_SIZE,
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -332,7 +310,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 100,
-    marginBottom: 30,
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: 'rgba(30, 144, 255, 0.1)',
   },
@@ -401,7 +379,7 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
-    marginTop: 40,
+    marginTop: 15,
     gap: 16,
     width: GRID_SIZE,
   },
@@ -485,7 +463,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   version: {
-    marginTop: 30,
+    marginTop: 15,
     marginBottom: 20,
     fontSize: 10,
     color: '#475569',
