@@ -20,8 +20,8 @@ const { width } = Dimensions.get('window');
 const GRID_SIZE = Math.min(width * 0.9, 400);
 const BOARD_PADDING = 16;
 const SQUARE_GAP = 12;
-const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2);
-const SQUARE_SIZE = (USABLE_WIDTH - (SQUARE_GAP * 2)) / 3;
+const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2) - 2; // Subtract board borders
+const SQUARE_SIZE = Math.floor((USABLE_WIDTH - (SQUARE_GAP * 2)) / 3);
 
 
 
@@ -423,11 +423,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   victoryTitle: {
-    fontSize: 56,
+    fontSize: 48, // Slightly smaller for better fit
     fontWeight: '900',
     color: '#FFF',
-    letterSpacing: 12,
+    letterSpacing: 8,
     marginTop: 20,
+    lineHeight: 60, // Ensure height isn't clipped
+    paddingVertical: 10,
+    textAlign: 'center',
   },
   victorySubtitle: {
     fontSize: 16,
