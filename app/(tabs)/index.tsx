@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
 import React, { useState } from 'react';
 
 import { Animated, Dimensions, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -163,18 +162,6 @@ export default function TicTacToeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Link href="/modal" asChild>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          activeOpacity={0.7}
-        >
-          <MaterialCommunityIcons
-            name="help-circle-outline"
-            size={24}
-            color={textColor}
-          />
-        </TouchableOpacity>
-      </Link>
 
       <View style={[styles.header, { marginTop: Platform.OS === 'web' ? 20 : 40 }]}>
         <ThemedText style={styles.title}>Tic Tac Toe</ThemedText>
@@ -262,15 +249,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#FDF7FF', // M3 Surface
-  },
-  settingsButton: {
-    position: 'absolute',
-    top: Platform.OS === 'web' ? 20 : 60,
-    right: 25,
-    zIndex: 10,
-    padding: 10,
-    backgroundColor: 'rgba(150, 150, 150, 0.1)',
-    borderRadius: 12,
   },
   header: {
     alignItems: 'center',
