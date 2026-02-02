@@ -329,10 +329,10 @@ const styles = StyleSheet.create({
   },
   boardContainer: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.5,
-    shadowRadius: 30,
-    elevation: 20,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
   board: {
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
