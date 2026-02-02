@@ -214,9 +214,9 @@ export default function TicTacToeScreen() {
         </Animated.View>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.glassButton} onPress={resetGame}>
-            <RotateCcw size={20} color="#0F172A" />
-            <ThemedText style={styles.buttonText}>NEW ROUND</ThemedText>
+          <TouchableOpacity style={[styles.glassButton, styles.primaryButton]} onPress={resetGame}>
+            <RotateCcw size={20} color="#FFF" />
+            <ThemedText style={styles.primaryButtonText}>NEW ROUND</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
@@ -287,19 +287,19 @@ const styles = StyleSheet.create({
   },
   glassScoreboard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
     borderRadius: 24,
     padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.1)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(30, 144, 255, 0.25)', // Darker border
     width: GRID_SIZE,
     justifyContent: 'space-between',
     marginBottom: 30,
     shadowColor: '#1E90FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 12 }, // More pronounced offset
+    shadowOpacity: 0.15, // Higher opacity
+    shadowRadius: 20, // Larger spread
+    elevation: 8,
   },
   scoreBox: {
     alignItems: 'center',
@@ -418,22 +418,37 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  primaryButton: {
+    backgroundColor: '#1E90FF',
+    borderColor: '#1E90FF',
+    shadowColor: '#1E90FF',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  primaryButtonText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 1.2,
+  },
   dangerButton: {
-    borderColor: 'rgba(255, 71, 77, 0.2)',
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(255, 71, 77, 0.4)',
+    borderWidth: 2,
   },
   buttonText: {
     fontSize: 14,
     fontWeight: '800',
     color: '#0F172A',
     letterSpacing: 1.2,
-    backgroundColor: 'transparent',
   },
   dangerButtonText: {
     fontSize: 14,
     fontWeight: '800',
     color: '#FF474D',
     letterSpacing: 1.2,
-    backgroundColor: 'transparent',
   },
   victoryOverlay: {
     ...StyleSheet.absoluteFillObject,
