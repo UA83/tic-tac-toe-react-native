@@ -360,11 +360,6 @@ const styles = StyleSheet.create({
     height: 80,
     borderWidth: 1,
     borderColor: '#E0E0E0',    // Suble but visible border
-    elevation: 4,              // Better shadow for Android
-    shadowColor: '#000',       // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   winSquare: {
     backgroundColor: '#1E90FF',
