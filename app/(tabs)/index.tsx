@@ -30,6 +30,7 @@ export default function TicTacToeScreen() {
   const [xIsNext, setXIsNext] = useState(true);
   const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
   const [lastWinner, setLastWinner] = useState<string | null>(null);
+  const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
   const [, setStarter] = useState<'X' | 'O'>('X');
 
   const boardScale = useSharedValue(1);
@@ -90,6 +91,7 @@ export default function TicTacToeScreen() {
 
   const resetGame = useCallback(() => {
     setBoard(Array(9).fill(null));
+    setShowWinnerOverlay(false);
     if (lastWinner) {
       setXIsNext(lastWinner === 'X');
       setStarter(lastWinner as 'X' | 'O');
@@ -104,10 +106,23 @@ export default function TicTacToeScreen() {
 
   useEffect(() => {
     if (winner) {
-      const timer = setTimeout(() => {
-        resetGame();
-      }, 2500);
-      return () => clearTimeout(timer);
+      if (winner !== 'Draw') {
+        const timer = setTimeout(() => {
+          setShowWinnerOverlay(true);
+        }, 250);
+        const resetTimer = setTimeout(() => {
+          resetGame();
+        }, 2750); // 250ms delay + 2500ms view time
+        return () => {
+          clearTimeout(timer);
+          clearTimeout(resetTimer);
+        };
+      } else {
+        const timer = setTimeout(() => {
+          resetGame();
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [winner, resetGame]);
 
@@ -218,7 +233,7 @@ export default function TicTacToeScreen() {
       </Animated.View>
       <ThemedText style={styles.version}>UA83v{packageJson.version}</ThemedText>
 
-      {winner && winner !== 'Draw' && (
+      {showWinnerOverlay && winner && winner !== 'Draw' && (
         <Animated.View
           entering={FadeIn.duration(400)}
           exiting={FadeOut.duration(400)}
