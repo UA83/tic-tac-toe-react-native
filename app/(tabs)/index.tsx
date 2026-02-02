@@ -212,7 +212,7 @@ export default function TicTacToeScreen() {
 
           <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
             <Trash2 size={20} color="#FFF" />
-            <ThemedText style={styles.dangerButtonText}>RESET ALL</ThemedText>
+            <ThemedText style={styles.dangerButtonText}>RESET SCORE</ThemedText>
           </TouchableOpacity>
         </View>
       </Animated.View>
