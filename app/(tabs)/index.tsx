@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Circle, Handshake, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -32,7 +32,24 @@ export default function TicTacToeScreen() {
   const [lastWinner, setLastWinner] = useState<string | null>(null);
   const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
   const [showDrawOverlay, setShowDrawOverlay] = useState(false);
+  const [playerColors, setPlayerColors] = useState({ X: '#FF474D', O: '#1E90FF' });
+  const [showColorPicker, setShowColorPicker] = useState<'X' | 'O' | null>(null);
   const [, setStarter] = useState<'X' | 'O'>('X');
+
+  const colorPalette = [
+    '#FF474D', // Red
+    '#1E90FF', // Blue
+    '#10B981', // Green
+    '#F59E0B', // Orange
+    '#8B5CF6', // Purple
+    '#EC4899', // Pink
+    '#14B8A6', // Teal
+    '#F97316', // Deep Orange
+    '#6366F1', // Indigo
+    '#EAB308', // Yellow
+    '#06B6D4', // Cyan
+    '#84CC16', // Lime
+  ];
 
   const boardScale = useSharedValue(1);
 
@@ -168,7 +185,7 @@ export default function TicTacToeScreen() {
           <Animated.View entering={ZoomIn.springify()}>
             <X
               size={SQUARE_SIZE * 0.6}
-              color={isWinSquare ? '#FFFFFF' : '#FF474D'}
+              color={isWinSquare ? '#FFFFFF' : playerColors.X}
               strokeWidth={3}
             />
           </Animated.View>
@@ -177,7 +194,7 @@ export default function TicTacToeScreen() {
           <Animated.View entering={ZoomIn.springify()}>
             <Circle
               size={SQUARE_SIZE * 0.55}
-              color={isWinSquare ? '#FFFFFF' : '#1E90FF'}
+              color={isWinSquare ? '#FFFFFF' : playerColors.O}
               strokeWidth={3}
             />
           </Animated.View>
@@ -198,24 +215,24 @@ export default function TicTacToeScreen() {
         </View>
 
         <View style={styles.glassScoreboard}>
-          <View style={styles.scoreBox}>
-            <ThemedText style={[styles.scoreLabel, { color: '#FF474D' }]}>PLAYER X</ThemedText>
+          <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('X')}>
+            <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]}>PLAYER X</ThemedText>
             <ThemedText style={styles.scoreNumber}>{scores.X}</ThemedText>
-          </View>
+          </TouchableOpacity>
           <View style={styles.scoreDivider} />
           <View style={styles.scoreBox}>
             <ThemedText style={styles.scoreLabel}>DRAWS</ThemedText>
             <ThemedText style={styles.scoreNumber}>{scores.Draws}</ThemedText>
           </View>
           <View style={styles.scoreDivider} />
-          <View style={styles.scoreBox}>
-            <ThemedText style={[styles.scoreLabel, { color: '#1E90FF' }]}>PLAYER O</ThemedText>
+          <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('O')}>
+            <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]}>PLAYER O</ThemedText>
             <ThemedText style={styles.scoreNumber}>{scores.O}</ThemedText>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.statusContainer}>
-          <View style={[styles.indicator, { backgroundColor: xIsNext ? '#FF474D' : '#1E90FF' }]} />
+          <View style={[styles.indicator, { backgroundColor: xIsNext ? playerColors.X : playerColors.O }]} />
           <ThemedText style={styles.statusText}>{status}</ThemedText>
         </View>
 
@@ -278,6 +295,47 @@ export default function TicTacToeScreen() {
           </LinearGradient>
         </Animated.View>
       )}
+
+      {/* Color Picker Modal */}
+      <Modal
+        visible={showColorPicker !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowColorPicker(null)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowColorPicker(null)}
+        >
+          <Pressable style={styles.colorPickerContainer} onPress={(e) => e.stopPropagation()}>
+            <ThemedText style={styles.colorPickerTitle}>
+              Choose Color for Player {showColorPicker}
+            </ThemedText>
+            <View style={styles.colorGrid}>
+              {colorPalette.map((color) => (
+                <TouchableOpacity
+                  key={color}
+                  style={[
+                    styles.colorOption,
+                    { backgroundColor: color },
+                    playerColors[showColorPicker as 'X' | 'O'] === color && styles.selectedColor,
+                  ]}
+                  onPress={() => {
+                    if (showColorPicker) {
+                      setPlayerColors(prev => ({ ...prev, [showColorPicker]: color }));
+                      setShowColorPicker(null);
+                    }
+                  }}
+                >
+                  {playerColors[showColorPicker as 'X' | 'O'] === color && (
+                    <View style={styles.checkmark} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
     </View>
   );
@@ -523,5 +581,58 @@ const styles = StyleSheet.create({
     color: '#475569',
     fontWeight: '700',
     letterSpacing: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  colorPickerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  colorPickerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontFamily: 'Ubuntu_700Bold',
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  colorOption: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: 'transparent',
+  },
+  selectedColor: {
+    borderColor: '#0F172A',
+    borderWidth: 4,
+  },
+  checkmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 2,
+    borderColor: '#0F172A',
   },
 });
