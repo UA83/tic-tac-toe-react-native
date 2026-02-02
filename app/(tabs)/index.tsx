@@ -245,19 +245,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     padding: 20,
-    paddingTop: Platform.OS === 'web' ? 40 : 80,
+    paddingBottom: 80, // Push content upwards
     backgroundColor: '#FDF7FF', // M3 Surface
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    marginBottom: 24,
+    marginBottom: 16,
     letterSpacing: -0.5,
     fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-medium' }),
   },
