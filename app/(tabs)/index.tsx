@@ -6,7 +6,7 @@ import Animated, {
   FadeIn,
   FadeInDown,
   FadeOut,
-  ScaleInCenter,
+  ZoomIn,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -15,7 +15,6 @@ import Animated, {
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useThemeColor } from '@/hooks/use-theme-color';
 
 const { width } = Dimensions.get('window');
 const GRID_SIZE = Math.min(width * 0.9, 400);
@@ -24,7 +23,7 @@ const SQUARE_GAP = 12;
 const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2);
 const SQUARE_SIZE = (USABLE_WIDTH - (SQUARE_GAP * 2)) / 3;
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 
 export default function TicTacToeScreen() {
   const packageJson = require('../../package.json');
@@ -34,7 +33,6 @@ export default function TicTacToeScreen() {
   const [lastWinner, setLastWinner] = useState<string | null>(null);
   const [, setStarter] = useState<'X' | 'O'>('X');
 
-  const tintColor = useThemeColor({}, 'tint');
   const boardScale = useSharedValue(1);
 
   const calculateWinner = (squares: (string | null)[]) => {
@@ -145,7 +143,7 @@ export default function TicTacToeScreen() {
         ]}
       >
         {value === 'X' && (
-          <Animated.View entering={ScaleInCenter.springify()}>
+          <Animated.View entering={ZoomIn.springify()}>
             <X
               size={SQUARE_SIZE * 0.6}
               color={isWinSquare ? '#FFFFFF' : '#FF474D'}
@@ -154,7 +152,7 @@ export default function TicTacToeScreen() {
           </Animated.View>
         )}
         {value === 'O' && (
-          <Animated.View entering={ScaleInCenter.springify()}>
+          <Animated.View entering={ZoomIn.springify()}>
             <Circle
               size={SQUARE_SIZE * 0.55}
               color={isWinSquare ? '#FFFFFF' : '#1E90FF'}
@@ -239,7 +237,7 @@ export default function TicTacToeScreen() {
             colors={['rgba(30, 144, 255, 0.95)', 'rgba(15, 23, 42, 0.98)']}
             style={styles.victoryGradient}
           >
-            <Animated.View entering={ScaleInCenter.delay(200).springify()}>
+            <Animated.View entering={ZoomIn.delay(200).springify()}>
               <Trophy size={120} color="#FFD700" strokeWidth={1.5} />
             </Animated.View>
             <ThemedText style={styles.victoryTitle}>VICTORY</ThemedText>
