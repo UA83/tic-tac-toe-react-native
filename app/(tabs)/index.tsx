@@ -249,11 +249,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 70 : 50,
+    paddingTop: Platform.OS === 'ios' ? 40 : 20,
   },
   header: {
     alignItems: 'center',
     marginBottom: 15,
+    marginTop: 60, // Force move on Android
   },
   title: {
     fontSize: 42,
