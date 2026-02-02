@@ -247,6 +247,8 @@ export default function TicTacToeScreen() {
           </Animated.View>
         </View>
       )}
+
+      <ThemedText style={styles.versionText}>v1.0.0</ThemedText>
     </ThemedView>
   );
 }
@@ -438,5 +440,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: 'rgba(0, 0, 0, 0.6)',
+  },
+  versionText: {
+    position: 'absolute',
+    bottom: 20,
+    fontSize: 12,
+    opacity: 0.3,
+    fontWeight: '600',
   },
 });
