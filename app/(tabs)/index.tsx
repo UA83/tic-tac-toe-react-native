@@ -216,7 +216,7 @@ export default function TicTacToeScreen() {
           </TouchableOpacity>
         </View>
       </Animated.View>
-      <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
+      <ThemedText style={styles.version}>UA83v{packageJson.version}</ThemedText>
 
       {winner && winner !== 'Draw' && (
         <Animated.View
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 40 : 20,
+    paddingTop: Platform.OS === 'ios' ? 70 : 50,
   },
   header: {
     alignItems: 'center',
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   version: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 5,
     alignSelf: 'center',
     fontSize: 10,
     color: '#475569',
