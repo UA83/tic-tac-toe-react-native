@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 40 : 20,
+    paddingTop: Platform.OS === 'ios' ? 40 : 0,
   },
   header: {
     alignItems: 'center',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   glassScoreboard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF', // Solid opaque white for Android/Web consistency
-    borderRadius: 10,
+    borderRadius: 5,
     padding: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0', // Solid light border
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
   square: {
     backgroundColor: '#FFFFFF', // Solid white so they all look the same
-    borderRadius: 15,          // Rounded corners for the "Next Gen" look
+    borderRadius: 5,          // Rounded corners for the "Next Gen" look
     alignItems: 'center',
     justifyContent: 'center',
     width: 80,                 // Ensure fixed dimensions
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.8)', // Brighter opacity
     height: 56,
-    borderRadius: 20,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   },
   version: {
     position: 'absolute',
-    bottom: 5,
+    bottom: 0,
     alignSelf: 'center',
     fontSize: 10,
     color: '#475569',
