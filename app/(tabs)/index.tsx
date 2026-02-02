@@ -16,6 +16,7 @@ const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2);
 const SQUARE_SIZE = (USABLE_WIDTH - (SQUARE_GAP * 2)) / 3;
 
 export default function TicTacToeScreen() {
+  const packageJson = require('../../package.json');
   const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
