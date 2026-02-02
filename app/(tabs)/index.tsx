@@ -221,7 +221,7 @@ export default function TicTacToeScreen() {
 
           <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
             <Trash2 size={20} color="#FF474D" />
-            <ThemedText style={[styles.buttonText, { color: '#FF474D' }]}>RESET ALL</ThemedText>
+            <ThemedText style={styles.dangerButtonText}>RESET ALL</ThemedText>
           </TouchableOpacity>
         </View>
         <ThemedText style={styles.version}>NODE_v{packageJson.version}_PROT_2026</ThemedText>
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   glassButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Brighter opacity
     height: 56,
     borderRadius: 20,
     alignItems: 'center',
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   victoryTitle: {
     fontSize: 48,
     fontWeight: '900',
-    color: '#FFF',
+    color: '#0F172A', // High contrast color
     letterSpacing: 8,
     marginTop: 20,
     lineHeight: 60,
