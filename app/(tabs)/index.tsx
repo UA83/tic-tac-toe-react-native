@@ -287,19 +287,19 @@ const styles = StyleSheet.create({
   },
   glassScoreboard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#FFFFFF', // Solid opaque white for Android/Web consistency
     borderRadius: 24,
     padding: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(30, 144, 255, 0.25)', // Darker border
+    borderWidth: 1,
+    borderColor: '#E2E8F0', // Solid light border
     width: GRID_SIZE,
     justifyContent: 'space-between',
     marginBottom: 30,
-    shadowColor: '#1E90FF',
-    shadowOffset: { width: 0, height: 12 }, // More pronounced offset
-    shadowOpacity: 0.15, // Higher opacity
-    shadowRadius: 20, // Larger spread
-    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
   },
   scoreBox: {
     alignItems: 'center',
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   scoreDivider: {
     width: 1,
     height: '60%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#E2E8F0', // Visible divider
     alignSelf: 'center',
   },
   statusContainer: {
