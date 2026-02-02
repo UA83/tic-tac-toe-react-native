@@ -26,11 +26,11 @@ export default function TicTacToeScreen() {
   const tintColor = useThemeColor({}, 'tint');
 
   // Material 3 Color Tokens
-  const surfaceVariant = useThemeColor({ light: '#E7E0EC', dark: '#49454F' }, 'background');
-  const onSurface = useThemeColor({ light: '#1C1B1F', dark: '#E6E1E5' }, 'text');
-  const primaryColor = tintColor; // Usually #6750A4
-  const secondaryContainer = useThemeColor({ light: '#E8DEF8', dark: '#4A4458' }, 'background');
-  const onSecondaryContainer = useThemeColor({ light: '#1D192B', dark: '#E8DEF8' }, 'text');
+  const surfaceVariant = useThemeColor({ light: '#E0E2EC', dark: '#43474E' }, 'background');
+  const onSurface = useThemeColor({ light: '#191C1E', dark: '#E2E2E6' }, 'text');
+  const primaryColor = tintColor; // Dodger Blue #1E90FF
+  const secondaryContainer = useThemeColor({ light: '#D1E4FF', dark: '#004977' }, 'background');
+  const onSecondaryContainer = useThemeColor({ light: '#001D36', dark: '#D1E4FF' }, 'text');
 
   const calculateWinner = (squares: (string | null)[]) => {
     const lines = [
@@ -246,9 +246,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
     paddingBottom: 80, // Push content upwards
-    backgroundColor: '#FDF7FF', // M3 Surface
+    backgroundColor: '#F8F9FF', // Cool Light Surface
   },
   header: {
     alignItems: 'center',
@@ -324,7 +323,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   winSquare: {
-    backgroundColor: '#6750A4',
+    backgroundColor: '#1E90FF',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -367,7 +366,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   winCard: {
-    backgroundColor: '#F7F2FA',
+    backgroundColor: '#EEF1FB', // Light Blue Surface
     padding: 32,
     borderRadius: 28,
     alignItems: 'center',
@@ -393,7 +392,7 @@ const styles = StyleSheet.create({
   winTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1C1B1F',
+    color: '#001D36',
     letterSpacing: 0.5,
     marginBottom: 8,
   },
