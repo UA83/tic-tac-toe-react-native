@@ -276,11 +276,6 @@ const styles = StyleSheet.create({
     width: GRID_SIZE,
     justifyContent: 'space-between',
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
   },
   scoreBox: {
     alignItems: 'center',
@@ -315,11 +310,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
     width: GRID_SIZE,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
   },
   indicator: {
     width: 8,
