@@ -34,6 +34,7 @@ export default function TicTacToeScreen() {
   const [showDrawOverlay, setShowDrawOverlay] = useState(false);
   const [playerColors, setPlayerColors] = useState({ X: '#FF474D', O: '#1E90FF' });
   const [showColorPicker, setShowColorPicker] = useState<'X' | 'O' | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [, setStarter] = useState<'X' | 'O'>('X');
 
   const colorPalette = [
@@ -52,6 +53,16 @@ export default function TicTacToeScreen() {
   ];
 
   const boardScale = useSharedValue(1);
+
+  // Auto-hide toast after 2 seconds
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const calculateWinner = (squares: (string | null)[]) => {
     const lines = [
@@ -312,30 +323,57 @@ export default function TicTacToeScreen() {
               Choose Color for Player {showColorPicker}
             </ThemedText>
             <View style={styles.colorGrid}>
-              {colorPalette.map((color) => (
-                <TouchableOpacity
-                  key={color}
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color },
-                    playerColors[showColorPicker as 'X' | 'O'] === color && styles.selectedColor,
-                  ]}
-                  onPress={() => {
-                    if (showColorPicker) {
-                      setPlayerColors(prev => ({ ...prev, [showColorPicker]: color }));
-                      setShowColorPicker(null);
-                    }
-                  }}
-                >
-                  {playerColors[showColorPicker as 'X' | 'O'] === color && (
-                    <View style={styles.checkmark} />
-                  )}
-                </TouchableOpacity>
-              ))}
+              {colorPalette.map((color) => {
+                const otherPlayer = showColorPicker === 'X' ? 'O' : 'X';
+                const isColorTaken = playerColors[otherPlayer] === color;
+                const isSelected = playerColors[showColorPicker as 'X' | 'O'] === color;
+
+                return (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorOption,
+                      { backgroundColor: color },
+                      isSelected && styles.selectedColor,
+                      isColorTaken && styles.disabledColor,
+                    ]}
+                    onPress={() => {
+                      if (showColorPicker) {
+                        if (isColorTaken) {
+                          const otherPlayerName = showColorPicker === 'X' ? 'O' : 'X';
+                          setToastMessage(`This color is already taken by Player ${otherPlayerName}!`);
+                        } else {
+                          setPlayerColors(prev => ({ ...prev, [showColorPicker]: color }));
+                          setShowColorPicker(null);
+                        }
+                      }
+                    }}
+                    disabled={false}
+                  >
+                    {isSelected && (
+                      <View style={styles.checkmark} />
+                    )}
+                    {isColorTaken && (
+                      <View style={styles.disabledOverlay} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Animated.View
+          entering={FadeInDown.duration(300)}
+          exiting={FadeOut.duration(300)}
+          style={styles.toast}
+        >
+          <ThemedText style={styles.toastText}>{toastMessage}</ThemedText>
+        </Animated.View>
+      )}
 
     </View>
   );
@@ -634,5 +672,36 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderWidth: 2,
     borderColor: '#0F172A',
+  },
+  disabledColor: {
+    opacity: 0.4,
+  },
+  disabledOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toast: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 2000,
+  },
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
