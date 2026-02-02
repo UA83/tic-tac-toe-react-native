@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Circle, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
+import { Circle, Handshake, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -31,6 +31,7 @@ export default function TicTacToeScreen() {
   const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
   const [lastWinner, setLastWinner] = useState<string | null>(null);
   const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
+  const [showDrawOverlay, setShowDrawOverlay] = useState(false);
   const [, setStarter] = useState<'X' | 'O'>('X');
 
   const boardScale = useSharedValue(1);
@@ -92,6 +93,7 @@ export default function TicTacToeScreen() {
   const resetGame = useCallback(() => {
     setBoard(Array(9).fill(null));
     setShowWinnerOverlay(false);
+    setShowDrawOverlay(false);
     if (lastWinner) {
       setXIsNext(lastWinner === 'X');
       setStarter(lastWinner as 'X' | 'O');
@@ -109,19 +111,25 @@ export default function TicTacToeScreen() {
       if (winner !== 'Draw') {
         const timer = setTimeout(() => {
           setShowWinnerOverlay(true);
-        }, 250);
+        }, 500);
         const resetTimer = setTimeout(() => {
           resetGame();
-        }, 2750); // 250ms delay + 2500ms view time
+        }, 2000);
         return () => {
           clearTimeout(timer);
           clearTimeout(resetTimer);
         };
       } else {
         const timer = setTimeout(() => {
+          setShowDrawOverlay(true);
+        }, 500);
+        const resetTimer = setTimeout(() => {
           resetGame();
         }, 2000);
-        return () => clearTimeout(timer);
+        return () => {
+          clearTimeout(timer);
+          clearTimeout(resetTimer);
+        };
       }
     }
   }, [winner, resetGame]);
@@ -248,6 +256,25 @@ export default function TicTacToeScreen() {
             </Animated.View>
             <ThemedText style={styles.victoryTitle}>VICTORY</ThemedText>
             <ThemedText style={styles.victorySubtitle}>PLAYER {winner} DOMINATES</ThemedText>
+          </LinearGradient>
+        </Animated.View>
+      )}
+
+      {showDrawOverlay && winner === 'Draw' && (
+        <Animated.View
+          entering={FadeIn.duration(400)}
+          exiting={FadeOut.duration(400)}
+          style={styles.victoryOverlay}
+        >
+          <LinearGradient
+            colors={['rgba(100, 116, 139, 0.9)', 'rgba(255, 255, 255, 0.95)']}
+            style={styles.victoryGradient}
+          >
+            <Animated.View entering={ZoomIn.delay(200).springify()}>
+              <Handshake size={120} color="#64748B" strokeWidth={1.5} />
+            </Animated.View>
+            <ThemedText style={styles.drawTitle}>DRAW</ThemedText>
+            <ThemedText style={styles.drawSubtitle}>EVENLY MATCHED</ThemedText>
           </LinearGradient>
         </Animated.View>
       )}
@@ -466,6 +493,24 @@ const styles = StyleSheet.create({
   victorySubtitle: {
     fontSize: 16,
     color: '#FFD700',
+    fontWeight: '700',
+    letterSpacing: 4,
+    textTransform: 'uppercase',
+  },
+  drawTitle: {
+    fontSize: 48,
+    fontWeight: '900',
+    color: '#0F172A',
+    letterSpacing: 8,
+    fontFamily: 'Ubuntu_700Bold',
+    marginTop: 20,
+    lineHeight: 60,
+    paddingVertical: 10,
+    textAlign: 'center',
+  },
+  drawSubtitle: {
+    fontSize: 16,
+    color: '#64748B',
     fontWeight: '700',
     letterSpacing: 4,
     textTransform: 'uppercase',
