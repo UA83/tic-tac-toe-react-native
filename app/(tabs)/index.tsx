@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
 
@@ -23,7 +22,6 @@ export default function TicTacToeScreen() {
   const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
   const [lastWinner, setLastWinner] = useState<string | null>(null);
   const [, setStarter] = useState<'X' | 'O'>('X');
-  const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const popAnim = React.useRef(new Animated.Value(0)).current;
 
   const textColor = useThemeColor({}, 'text');
@@ -83,10 +81,6 @@ export default function TicTacToeScreen() {
     }
 
     setXIsNext(!xIsNext);
-
-    if (Platform.OS !== 'web' && hapticsEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
   };
 
   const resetGame = React.useCallback(() => {
@@ -101,11 +95,7 @@ export default function TicTacToeScreen() {
         return nextS;
       });
     }
-
-    if (Platform.OS !== 'web' && hapticsEnabled) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-  }, [lastWinner, hapticsEnabled]);
+  }, [lastWinner]);
 
   React.useEffect(() => {
     if (winner) {
@@ -173,21 +163,9 @@ export default function TicTacToeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={() => setHapticsEnabled(!hapticsEnabled)}
-      >
-        <MaterialCommunityIcons
-          name={hapticsEnabled ? "vibrate" : "vibrate-off"}
-          size={24}
-          color={textColor}
-          style={{ opacity: hapticsEnabled ? 1 : 0.4 }}
-        />
-      </TouchableOpacity>
-
       <Link href="/modal" asChild>
         <TouchableOpacity
-          style={[styles.settingsButton, { right: 80 }]}
+          style={styles.settingsButton}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
