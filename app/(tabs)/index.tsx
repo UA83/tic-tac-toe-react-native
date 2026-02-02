@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#0F172A',
     letterSpacing: 8,
-    fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-black' }),
+    fontFamily: 'Ubuntu_700Bold',
     lineHeight: 52,
     paddingVertical: 10,
     textAlign: 'center',
@@ -451,6 +451,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#0F172A', // High contrast color
     letterSpacing: 8,
+    fontFamily: 'Ubuntu_700Bold',
     marginTop: 20,
     lineHeight: 60,
     paddingVertical: 10,
