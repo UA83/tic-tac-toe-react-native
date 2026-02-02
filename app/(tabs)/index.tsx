@@ -167,13 +167,13 @@ export default function TicTacToeScreen() {
   return (
     <ThemedView style={styles.container}>
       <LinearGradient
-        colors={['#0F172A', '#1E293B', '#0F172A']}
+        colors={['#FFFFFF', '#E0F2FE', '#F8FAFC']}
         style={StyleSheet.absoluteFill}
       />
 
       {/* Decorative ambient glows */}
-      <View style={[styles.glow, { top: -100, left: -50, backgroundColor: '#1E90FF22' }]} />
-      <View style={[styles.glow, { bottom: -100, right: -50, backgroundColor: '#FF880011' }]} />
+      <View style={[styles.glow, { top: -100, left: -50, backgroundColor: '#1E90FF15' }]} />
+      <View style={[styles.glow, { bottom: -100, right: -50, backgroundColor: '#FF880008' }]} />
 
       <Animated.View
         entering={FadeInDown.duration(800).delay(200)}
@@ -235,7 +235,7 @@ export default function TicTacToeScreen() {
           style={styles.victoryOverlay}
         >
           <LinearGradient
-            colors={['rgba(30, 144, 255, 0.95)', 'rgba(15, 23, 42, 0.98)']}
+            colors={['rgba(30, 144, 255, 0.9)', 'rgba(255, 255, 255, 0.95)']}
             style={styles.victoryGradient}
           >
             <Animated.View entering={ZoomIn.delay(200).springify()}>
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 42,
     fontWeight: '900',
-    color: '#FFF',
+    color: '#0F172A',
     letterSpacing: 8,
     fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-black' }),
   },
@@ -288,14 +288,19 @@ const styles = StyleSheet.create({
   },
   glassScoreboard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(30, 144, 255, 0.1)',
     width: GRID_SIZE,
     justifyContent: 'space-between',
     marginBottom: 30,
+    shadowColor: '#1E90FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 2,
   },
   scoreBox: {
     alignItems: 'center',
@@ -311,7 +316,7 @@ const styles = StyleSheet.create({
   scoreNumber: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#F8FAFC',
+    color: '#0F172A',
   },
   scoreDivider: {
     width: 1,
@@ -322,13 +327,13 @@ const styles = StyleSheet.create({
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 100,
     marginBottom: 30,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(30, 144, 255, 0.1)',
   },
   indicator: {
     width: 8,
@@ -342,7 +347,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#CBD5E1',
+    color: '#475569',
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
@@ -354,10 +359,10 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   board: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 40,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(30, 144, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -371,12 +376,17 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   square: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(30, 144, 255, 0.05)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   winSquare: {
     backgroundColor: '#1E90FF',
@@ -395,14 +405,19 @@ const styles = StyleSheet.create({
   glassButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     height: 56,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(30, 144, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   dangerButton: {
     borderColor: 'rgba(255, 71, 77, 0.2)',
@@ -410,7 +425,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#FFF',
+    color: '#0F172A',
     letterSpacing: 1.2,
   },
   victoryOverlay: {
