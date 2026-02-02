@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
   },
   versionText: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 10,
     fontSize: 12,
     opacity: 0.3,
     fontWeight: '600',
