@@ -248,7 +248,7 @@ export default function TicTacToeScreen() {
         </View>
       )}
 
-      <ThemedText style={styles.versionText}>v1.0.0</ThemedText>
+      <ThemedText style={styles.versionText}>v{Constants.expoConfig?.version}</ThemedText>
     </ThemedView>
   );
 }
