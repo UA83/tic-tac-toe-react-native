@@ -14,7 +14,6 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 
 const { width } = Dimensions.get('window');
 const GRID_SIZE = Math.min(width * 0.9, 400);
@@ -165,7 +164,7 @@ export default function TicTacToeScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <LinearGradient
         colors={['#FFFFFF', '#E0F2FE', '#F8FAFC']}
         style={StyleSheet.absoluteFill}
@@ -216,7 +215,7 @@ export default function TicTacToeScreen() {
 
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.glassButton} onPress={resetGame}>
-            <RotateCcw size={20} color="#FFF" />
+            <RotateCcw size={20} color="#0F172A" />
             <ThemedText style={styles.buttonText}>NEW ROUND</ThemedText>
           </TouchableOpacity>
 
@@ -247,14 +246,14 @@ export default function TicTacToeScreen() {
         </Animated.View>
       )}
 
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: 'transparent',
   },
   content: {
     flex: 1,
@@ -359,7 +358,7 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   board: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
     borderRadius: 40,
     borderWidth: 1,
     borderColor: 'rgba(30, 144, 255, 0.1)',
@@ -376,7 +375,7 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   square: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -405,7 +404,7 @@ const styles = StyleSheet.create({
   glassButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
     height: 56,
     borderRadius: 20,
     alignItems: 'center',
@@ -427,6 +426,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#0F172A',
     letterSpacing: 1.2,
+    backgroundColor: 'transparent',
+  },
+  dangerButtonText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FF474D',
+    letterSpacing: 1.2,
+    backgroundColor: 'transparent',
   },
   victoryOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -438,12 +445,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   victoryTitle: {
-    fontSize: 48, // Slightly smaller for better fit
+    fontSize: 48,
     fontWeight: '900',
     color: '#FFF',
     letterSpacing: 8,
     marginTop: 20,
-    lineHeight: 60, // Ensure height isn't clipped
+    lineHeight: 60,
     paddingVertical: 10,
     textAlign: 'center',
   },
@@ -461,5 +468,5 @@ const styles = StyleSheet.create({
     color: '#475569',
     fontWeight: '700',
     letterSpacing: 1,
-  }
+  },
 });
