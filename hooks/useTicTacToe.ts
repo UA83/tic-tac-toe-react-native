@@ -43,7 +43,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
 
     const makeMove = (index: number) => {
         // Undo logic: if clicking the same square that was just marked
-        if (index === lastMoveIndex && board[index] && !winner) {
+        if (index === lastMoveIndex && board[index]) {
             const newBoard = [...board];
             const clearedPlayer = newBoard[index] as PlayerSymbol;
             newBoard[index] = null;
@@ -52,22 +52,18 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
             setLastMoveIndex(null);
 
             // If the cleared move was a winning/drawing move, decrement scores
-            // This is actually tricky because makeMove updates scores immediately
-            // But 'winner' is derived from 'board', so clearing board[index]
-            // automatically updates 'winner' to null in the next render cycle.
-            // However, 'scores' state was already updated.
-            const winPlayer = clearedPlayer;
-            const updatedScores = { ...scores };
-            if (updatedScores[winPlayer] > 0) {
-                // We need to check if the move we are undoing actually caused a win
-                // Let's re-calculate to be sure.
-                const currentWinInfo = TicTacToeEngine.calculateWinner(board);
-                if (currentWinInfo && currentWinInfo.winner === winPlayer) {
-                    updatedScores[winPlayer] -= 1;
+            // Use the board *before* clearing to check if it was a win
+            const winInfoBeforeUndo = TicTacToeEngine.calculateWinner(board);
+            if (winInfoBeforeUndo) {
+                const updatedScores = { ...scores };
+                if (winInfoBeforeUndo.winner === clearedPlayer) {
+                    updatedScores[clearedPlayer] = Math.max(0, updatedScores[clearedPlayer] - 1);
                     setScores(updatedScores);
-                } else if (currentWinInfo && currentWinInfo.winner === 'Draw') {
-                    updatedScores.Draws -= 1;
+                    setShowWinnerOverlay(false);
+                } else if (winInfoBeforeUndo.winner === 'Draw') {
+                    updatedScores.Draws = Math.max(0, updatedScores.Draws - 1);
                     setScores(updatedScores);
+                    setShowDrawOverlay(false);
                 }
             }
             return;
