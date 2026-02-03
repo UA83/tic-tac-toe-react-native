@@ -46,4 +46,20 @@ test.describe('Tic Tac Toe Move Undo', () => {
         await gamePage.board.clickSquare(2); // X marks 2
         await expect(gamePage.board.getSquareLocator(2).getByTestId('square-icon-X')).toBeVisible();
     });
+
+    test('should not allow undoing after 2 seconds', async ({ gamePage }) => {
+        // 1. Player X marks square 0
+        await gamePage.board.clickSquare(0);
+        await expect(gamePage.board.getSquareLocator(0).getByTestId('square-icon-X')).toBeVisible();
+
+        // 2. Wait for more than 2 seconds (e.g., 2.5s)
+        await gamePage.page.waitForTimeout(2500);
+
+        // 3. Try to undo
+        await gamePage.board.clickSquare(0);
+
+        // 4. Verify it's STILL visible (undo failed due to timeout)
+        await expect(gamePage.board.getSquareLocator(0).getByTestId('square-icon-X')).toBeVisible();
+        await expect(gamePage.getStatusLocator()).toContainText("Player O's Turn");
+    });
 });

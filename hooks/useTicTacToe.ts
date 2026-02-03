@@ -31,6 +31,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
     const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
     const [lastWinner, setLastWinner] = useState<PlayerSymbol | null>(null);
     const [lastMoveIndex, setLastMoveIndex] = useState<number | null>(null);
+    const [lastMoveTimestamp, setLastMoveTimestamp] = useState<number>(0);
     const [playerNames, setPlayerNames] = useState(INITIAL_PLAYER_NAMES);
     const [playerColors, setPlayerColors] = useState(INITIAL_COLORS);
     const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
@@ -44,6 +45,12 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
     const makeMove = (index: number) => {
         // Undo logic: if clicking the same square that was just marked
         if (index === lastMoveIndex && board[index]) {
+            // Check if 2 seconds have passed
+            const now = Date.now();
+            if (now - lastMoveTimestamp > 2000) {
+                return; // Too late to undo
+            }
+
             const newBoard = [...board];
             const clearedPlayer = newBoard[index] as PlayerSymbol;
             newBoard[index] = null;
@@ -76,6 +83,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
         newBoard[index] = currentPlayer;
         setBoard(newBoard);
         setLastMoveIndex(index);
+        setLastMoveTimestamp(Date.now());
 
         const nextWinInfo = TicTacToeEngine.calculateWinner(newBoard);
         if (nextWinInfo) {
@@ -95,6 +103,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
     const resetGame = useCallback(() => {
         setBoard(Array(9).fill(null));
         setLastMoveIndex(null);
+        setLastMoveTimestamp(0);
         setShowWinnerOverlay(false);
         setShowDrawOverlay(false);
         if (lastWinner) {
