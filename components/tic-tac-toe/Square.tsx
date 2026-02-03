@@ -10,14 +10,16 @@ interface SquareProps {
     onPress: () => void;
     isWinSquare: boolean;
     playerColors: { X: string; O: string };
+    testID?: string;
 }
 
 const USABLE_WIDTH = GAME_CONSTANTS.GRID_SIZE - (GAME_CONSTANTS.BOARD_PADDING * 2) - 2;
 const SQUARE_SIZE = Math.floor((USABLE_WIDTH - (GAME_CONSTANTS.SQUARE_GAP * 2)) / 3);
 
-export const Square = React.memo(({ value, onPress, isWinSquare, playerColors }: SquareProps) => {
+export const Square = React.memo(({ value, onPress, isWinSquare, playerColors, testID }: SquareProps) => {
     return (
         <Pressable
+            testID={testID}
             onPress={onPress}
             style={({ pressed }) => [
                 styles.square,

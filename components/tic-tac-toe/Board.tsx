@@ -40,6 +40,7 @@ export const Board = ({ board, onSquarePress, winLine, playerColors, winner }: B
                             onPress={() => onSquarePress(i)}
                             isWinSquare={winLine?.includes(i) || false}
                             playerColors={playerColors}
+                            testID={`square-${i}`}
                         />
                     ))}
                 </View>

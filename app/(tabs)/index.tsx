@@ -103,9 +103,9 @@ export default function TicTacToeScreen() {
           onPlayerPress={setActiveColorPicker}
         />
 
-        <View style={styles.statusContainer}>
+        <View style={styles.statusContainer} testID="game-status-container">
           <View style={[styles.indicator, { backgroundColor: xIsNext ? playerColors.X : playerColors.O }]} />
-          <ThemedText style={styles.statusText}>{status}</ThemedText>
+          <ThemedText style={styles.statusText} testID="game-status">{status}</ThemedText>
         </View>
 
         <Board
@@ -117,19 +117,27 @@ export default function TicTacToeScreen() {
         />
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.glassButton, styles.primaryButton]} onPress={resetGame}>
+          <TouchableOpacity
+            style={[styles.glassButton, styles.primaryButton]}
+            onPress={resetGame}
+            testID="new-round-btn"
+          >
             <RotateCcw size={20} color="#FFF" />
             <ThemedText style={styles.primaryButtonText}>NEW ROUND</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.glassButton, styles.dangerButton]} onPress={resetScoreboard}>
+          <TouchableOpacity
+            style={[styles.glassButton, styles.dangerButton]}
+            onPress={resetScoreboard}
+            testID="reset-score-btn"
+          >
             <Trash2 size={20} color="#FFF" />
             <ThemedText style={styles.dangerButtonText}>RESET SCORE</ThemedText>
           </TouchableOpacity>
         </View>
       </Animated.View>
 
-      <ThemedText style={styles.version}>UA83v{packageJson.version}</ThemedText>
+      <ThemedText style={styles.version} testID="app-version">UA83v{packageJson.version}</ThemedText>
 
       {/* Overlays */}
       {showWinnerOverlay && <VictoryOverlay winner={winner} playerNames={playerNames} />}

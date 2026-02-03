@@ -13,24 +13,32 @@ interface ScoreboardProps {
 
 export const Scoreboard = ({ scores, playerNames, playerColors, onPlayerPress }: ScoreboardProps) => {
     return (
-        <View style={styles.glassScoreboard}>
-            <TouchableOpacity style={styles.scoreBox} onPress={() => onPlayerPress('X')}>
-                <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]}>{playerNames.X}</ThemedText>
-                <ThemedText style={styles.scoreNumber}>{scores.X}</ThemedText>
+        <View style={styles.glassScoreboard} testID="scoreboard">
+            <TouchableOpacity
+                style={styles.scoreBox}
+                onPress={() => onPlayerPress('X')}
+                testID="player-x-btn"
+            >
+                <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]} testID="player-x-name">{playerNames.X}</ThemedText>
+                <ThemedText style={styles.scoreNumber} testID="player-x-score">{scores.X}</ThemedText>
             </TouchableOpacity>
 
             <View style={styles.scoreDivider} />
 
-            <View style={styles.scoreBox}>
+            <View style={styles.scoreBox} testID="draws-box">
                 <ThemedText style={styles.scoreLabel}>DRAWS</ThemedText>
-                <ThemedText style={styles.scoreNumber}>{scores.Draws}</ThemedText>
+                <ThemedText style={styles.scoreNumber} testID="draws-count">{scores.Draws}</ThemedText>
             </View>
 
             <View style={styles.scoreDivider} />
 
-            <TouchableOpacity style={styles.scoreBox} onPress={() => onPlayerPress('O')}>
-                <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]}>{playerNames.O}</ThemedText>
-                <ThemedText style={styles.scoreNumber}>{scores.O}</ThemedText>
+            <TouchableOpacity
+                style={styles.scoreBox}
+                onPress={() => onPlayerPress('O')}
+                testID="player-o-btn"
+            >
+                <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]} testID="player-o-name">{playerNames.O}</ThemedText>
+                <ThemedText style={styles.scoreNumber} testID="player-o-score">{scores.O}</ThemedText>
             </TouchableOpacity>
         </View>
     );

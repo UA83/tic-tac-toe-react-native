@@ -36,11 +36,17 @@ export const VictoryOverlay = ({ winner, playerNames }: VictoryOverlayProps) => 
                     }
                 </Animated.View>
 
-                <ThemedText style={isDraw ? styles.drawTitle : styles.victoryTitle}>
+                <ThemedText
+                    style={isDraw ? styles.drawTitle : styles.victoryTitle}
+                    testID="victory-title"
+                >
                     {isDraw ? 'DRAW' : 'VICTORY'}
                 </ThemedText>
 
-                <ThemedText style={isDraw ? styles.drawSubtitle : styles.victorySubtitle}>
+                <ThemedText
+                    style={isDraw ? styles.drawSubtitle : styles.victorySubtitle}
+                    testID="victory-subtitle"
+                >
                     {isDraw ? 'EVENLY MATCHED' : `${playerNames[winner as PlayerSymbol]} DOMINATES`}
                 </ThemedText>
             </LinearGradient>

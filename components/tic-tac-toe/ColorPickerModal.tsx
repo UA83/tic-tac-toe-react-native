@@ -52,6 +52,7 @@ export const ColorPickerModal = ({
                     <View style={styles.nameInputContainer}>
                         <ThemedText style={styles.inputLabel}>Player Name:</ThemedText>
                         <TextInput
+                            testID="player-name-input"
                             style={styles.nameInput}
                             value={tempName}
                             onChangeText={setTempName}
@@ -68,7 +69,7 @@ export const ColorPickerModal = ({
                     </View>
 
                     <ThemedText style={styles.inputLabel}>Choose Color:</ThemedText>
-                    <View style={styles.colorGrid}>
+                    <View style={styles.colorGrid} testID="color-grid">
                         {COLOR_PALETTE.map((color) => {
                             const otherPlayer = player === 'X' ? 'O' : 'X';
                             const isColorTaken = playerColors[otherPlayer] === color;
@@ -77,6 +78,7 @@ export const ColorPickerModal = ({
                             return (
                                 <TouchableOpacity
                                     key={color}
+                                    testID={`color-option-${color}`}
                                     style={[
                                         styles.colorOption,
                                         { backgroundColor: color },
