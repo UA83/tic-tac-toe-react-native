@@ -11,6 +11,10 @@ export class ColorPickerModalComponent {
         return await this.page.getByTestId('player-name-input').isVisible();
     }
 
+    getTitleLocator() {
+        return this.page.getByTestId('color-picker-title');
+    }
+
     async editPlayerName(newName: string) {
         const input = this.page.getByTestId('player-name-input');
         await input.clear();

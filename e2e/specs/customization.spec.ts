@@ -45,4 +45,25 @@ test.describe('Tic Tac Toe Player Customisation', () => {
         await expect(toast).toBeVisible({ timeout: 10000 });
         await expect(toast).toContainText('already taken');
     });
+
+    test('should update modal title after name change', async ({ gamePage }) => {
+        const newName = 'Champion';
+
+        // 1. Open customization for Player X
+        await gamePage.scoreboard.clickPlayerX();
+
+        // 2. Change the name and save
+        await gamePage.colorPicker.editPlayerName(newName);
+
+        // 3. Confirm name changed on scoreboard (which also confirms modal closed)
+        await expect(gamePage.scoreboard.getPlayerXNameLocator()).toHaveText(newName, { timeout: 10000 });
+
+        // 4. Reopen customization for the same player
+        await gamePage.scoreboard.clickPlayerX();
+
+        // 5. Check if the title reflects the new name
+        // The title format is "Customize {name} ({symbol})"
+        await expect(gamePage.colorPicker.getTitleLocator()).toContainText(newName, { timeout: 10000 });
+        await expect(gamePage.colorPicker.getTitleLocator()).toContainText('X', { timeout: 10000 });
+    });
 });

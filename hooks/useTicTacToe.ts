@@ -75,6 +75,8 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
 
     const resetScoreboard = () => {
         setScores({ X: 0, O: 0, Draws: 0 });
+        setPlayerNames(INITIAL_PLAYER_NAMES);
+        setPlayerColors(INITIAL_COLORS);
         setLastWinner(null);
         resetGame();
     };

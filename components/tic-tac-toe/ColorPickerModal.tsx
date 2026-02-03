@@ -45,7 +45,7 @@ export const ColorPickerModal = ({
         >
             <Pressable style={styles.modalOverlay} onPress={onClose}>
                 <Pressable style={styles.colorPickerContainer} onPress={(e) => e.stopPropagation()}>
-                    <ThemedText style={styles.colorPickerTitle}>
+                    <ThemedText style={styles.colorPickerTitle} testID="color-picker-title">
                         Customize {playerNames[player]} ({player})
                     </ThemedText>
 
