@@ -9,6 +9,7 @@ interface UseTicTacToeReturn {
     scores: { X: number; O: number; Draws: number };
     winner: GameResult;
     winLine: number[] | null;
+    lastMoveIndex: number | null;
     playerNames: Record<PlayerSymbol, string>;
     playerColors: Record<PlayerSymbol, string>;
     showWinnerOverlay: boolean;
@@ -29,6 +30,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
     const [xIsNext, setXIsNext] = useState(true);
     const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
     const [lastWinner, setLastWinner] = useState<PlayerSymbol | null>(null);
+    const [lastMoveIndex, setLastMoveIndex] = useState<number | null>(null);
     const [playerNames, setPlayerNames] = useState(INITIAL_PLAYER_NAMES);
     const [playerColors, setPlayerColors] = useState(INITIAL_COLORS);
     const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
@@ -40,12 +42,44 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
     const winLine = winInfo ? winInfo.line : null;
 
     const makeMove = (index: number) => {
+        // Undo logic: if clicking the same square that was just marked
+        if (index === lastMoveIndex && board[index] && !winner) {
+            const newBoard = [...board];
+            const clearedPlayer = newBoard[index] as PlayerSymbol;
+            newBoard[index] = null;
+            setBoard(newBoard);
+            setXIsNext(clearedPlayer === 'X'); // Revert turn
+            setLastMoveIndex(null);
+
+            // If the cleared move was a winning/drawing move, decrement scores
+            // This is actually tricky because makeMove updates scores immediately
+            // But 'winner' is derived from 'board', so clearing board[index]
+            // automatically updates 'winner' to null in the next render cycle.
+            // However, 'scores' state was already updated.
+            const winPlayer = clearedPlayer;
+            const updatedScores = { ...scores };
+            if (updatedScores[winPlayer] > 0) {
+                // We need to check if the move we are undoing actually caused a win
+                // Let's re-calculate to be sure.
+                const currentWinInfo = TicTacToeEngine.calculateWinner(board);
+                if (currentWinInfo && currentWinInfo.winner === winPlayer) {
+                    updatedScores[winPlayer] -= 1;
+                    setScores(updatedScores);
+                } else if (currentWinInfo && currentWinInfo.winner === 'Draw') {
+                    updatedScores.Draws -= 1;
+                    setScores(updatedScores);
+                }
+            }
+            return;
+        }
+
         if (board[index] || winner) return;
 
         const newBoard = [...board];
         const currentPlayer = xIsNext ? 'X' : 'O';
         newBoard[index] = currentPlayer;
         setBoard(newBoard);
+        setLastMoveIndex(index);
 
         const nextWinInfo = TicTacToeEngine.calculateWinner(newBoard);
         if (nextWinInfo) {
@@ -64,6 +98,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
 
     const resetGame = useCallback(() => {
         setBoard(Array(9).fill(null));
+        setLastMoveIndex(null);
         setShowWinnerOverlay(false);
         setShowDrawOverlay(false);
         if (lastWinner) {
@@ -87,6 +122,7 @@ export const useTicTacToe = (): UseTicTacToeReturn => {
         scores,
         winner,
         winLine,
+        lastMoveIndex,
         playerNames,
         playerColors,
         showWinnerOverlay,

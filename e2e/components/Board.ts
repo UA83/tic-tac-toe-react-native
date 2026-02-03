@@ -13,6 +13,10 @@ export class BoardComponent {
         await this.page.getByTestId(`square-${index}`).click();
     }
 
+    getSquareLocator(index: number): Locator {
+        return this.page.getByTestId(`square-${index}`);
+    }
+
     async getSquareValue(index: number): Promise<string> {
         return await this.page.getByTestId(`square-${index}`).innerText();
     }

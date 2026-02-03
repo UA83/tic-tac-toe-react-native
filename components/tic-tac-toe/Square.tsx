@@ -1,7 +1,7 @@
 import { Circle, X } from 'lucide-react-native';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated';
 import { GAME_CONSTANTS } from '../../constants/GameConstants';
 import { SquareValue } from '../../constants/types';
 
@@ -33,7 +33,7 @@ export const Square = React.memo(({ value, onPress, isWinSquare, playerColors, t
             ]}
         >
             {value === 'X' && (
-                <Animated.View entering={ZoomIn.springify()}>
+                <Animated.View entering={ZoomIn.springify()} exiting={ZoomOut.springify()} testID="square-icon-X">
                     <X
                         size={SQUARE_SIZE * 0.6}
                         color={isWinSquare ? '#FFFFFF' : playerColors.X}
@@ -42,7 +42,7 @@ export const Square = React.memo(({ value, onPress, isWinSquare, playerColors, t
                 </Animated.View>
             )}
             {value === 'O' && (
-                <Animated.View entering={ZoomIn.springify()}>
+                <Animated.View entering={ZoomIn.springify()} exiting={ZoomOut.springify()} testID="square-icon-O">
                     <Circle
                         size={SQUARE_SIZE * 0.55}
                         color={isWinSquare ? '#FFFFFF' : playerColors.O}
