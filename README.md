@@ -53,6 +53,34 @@ A modern, high-performance Tic-Tac-Toe game built with **React Native** and **Ex
 - **Expo Haptics**: Native vibration engine
 - **React Native Animated**: smooth victory transitions
 
-## 📜 License
+## � Local Development (Android Emulator)
+
+To run the app on an Android emulator on Linux, follow these steps:
+
+### 1. Configure Environment
+Add these lines to your `~/.bashrc` or `~/.zshrc` to ensure the Android SDK is correctly mapped:
+```bash
+# Android SDK
+export ANDROID_HOME=/home/deck/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools
+```
+Then, reload your shell configuration:
+```bash
+source ~/.bashrc
+```
+
+### 2. Start the Emulator
+You can launch the emulator from **any directory**. Run the following command to start the virtual device in the background:
+```bash
+emulator -avd Medium_Phone_API_36.1 &
+```
+
+### 3. Launch the App
+Once the emulator is started and visible, go to the project directory and run:
+```bash
+npm run android
+```
+
+## �📜 License
 
 Created by UA83. All rights reserved.
