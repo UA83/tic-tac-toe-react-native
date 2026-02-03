@@ -84,3 +84,37 @@ npm run android
 ## �📜 License
 
 Created by UA83. All rights reserved.
+
+## 🧪 Automated Testing
+
+The project uses **Playwright** for comprehensive end-to-end testing (E2E). The test suite covers game flow, scoring, and player customization.
+
+### Prerequisites for Testing
+Ensure the web server is running in the background:
+```bash
+npx expo start --web --port 3000
+```
+
+### Running Tests
+
+- **Headless Mode** (Standard):
+  ```bash
+  npx playwright test
+  ```
+
+- **Headed Mode** (Visible browser):
+  ```bash
+  npx playwright test --headed
+  ```
+
+- **UI Mode** (Interactive Dashboard):
+  ```bash
+  npx playwright test --ui
+  ```
+
+- **Slow Motion Mode**:
+  ```bash
+  SLOWMO=500 npx playwright test --headed
+  ```
+
+The test framework follows a **Component Object Model (COM)** pattern, ensuring high maintainability and stable locators via `testID` props.

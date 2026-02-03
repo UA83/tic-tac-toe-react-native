@@ -13,7 +13,7 @@ interface ColorPickerModalProps {
     onClose: () => void;
     onSave: (name: string, color: string) => void;
     toastMessage: string | null;
-    onColorSelect: (color: string, currentName: string) => void;
+    onColorSelect: (name: string, color: string) => void;
 }
 
 export const ColorPickerModal = ({
@@ -78,14 +78,14 @@ export const ColorPickerModal = ({
                             return (
                                 <TouchableOpacity
                                     key={color}
-                                    testID={`color-option-${color}`}
+                                    testID={`color-option-idx-${COLOR_PALETTE.indexOf(color)}`}
                                     style={[
                                         styles.colorOption,
                                         { backgroundColor: color },
                                         isSelected && styles.selectedColor,
                                         isColorTaken && styles.disabledColor,
                                     ]}
-                                    onPress={() => onColorSelect(color, tempName)}
+                                    onPress={() => onColorSelect(tempName, color)}
                                 >
                                     {isSelected && <View style={styles.checkmark} />}
                                     {isColorTaken && <View style={styles.disabledOverlay} />}
@@ -100,6 +100,7 @@ export const ColorPickerModal = ({
                         entering={FadeInDown.duration(300)}
                         exiting={FadeOut.duration(300)}
                         style={[styles.toast, { bottom: 50 }]}
+                        testID="color-picker-toast"
                     >
                         <ThemedText style={styles.toastText}>{toastMessage}</ThemedText>
                     </Animated.View>

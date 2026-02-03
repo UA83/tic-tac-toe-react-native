@@ -152,7 +152,7 @@ export default function TicTacToeScreen() {
         onClose={() => setActiveColorPicker(null)}
         onSave={onSave}
         toastMessage={toastMessage}
-        onColorSelect={(color: string, name: string) => onSave(name, color)}
+        onColorSelect={onSave}
       />
 
       {/* Universal Toast */}
