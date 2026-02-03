@@ -12,12 +12,14 @@ test.describe('Tic Tac Toe Game Flow', () => {
         await expect(gamePage.getStatusLocator()).toContainText("Player X's Turn");
     });
 
-    test('should not allow clicking an occupied square', async ({ gamePage }) => {
-        await gamePage.board.clickSquare(0);
-        await expect(gamePage.getStatusLocator()).toContainText("Player O's Turn");
+    test('should not allow clicking an occupied square (non-undo)', async ({ gamePage }) => {
+        await gamePage.board.clickSquare(0); // X marks 0
+        await gamePage.board.clickSquare(1); // O marks 1
+        await expect(gamePage.getStatusLocator()).toContainText("Player X's Turn");
 
+        // Click square 0 (held by X). It should NOT undo because O marked 1 last.
         await gamePage.board.clickSquare(0);
-        await expect(gamePage.getStatusLocator()).toContainText("Player O's Turn");
+        await expect(gamePage.getStatusLocator()).toContainText("Player X's Turn");
     });
 
     test('should detect a horizontal win for X', async ({ gamePage }) => {
