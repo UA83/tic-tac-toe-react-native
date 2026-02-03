@@ -1,224 +1,93 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { Circle, Handshake, RotateCcw, Trash2, Trophy, X } from 'lucide-react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, Modal, Platform, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeOut,
-  ZoomIn,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring
-} from 'react-native-reanimated';
+import { RotateCcw, Trash2 } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/themed-text';
-
-const { width } = Dimensions.get('window');
-const GRID_SIZE = Math.min(width * 0.9, 400);
-const BOARD_PADDING = 16;
-const SQUARE_GAP = 12;
-const USABLE_WIDTH = GRID_SIZE - (BOARD_PADDING * 2) - 2; // Subtract board borders
-const SQUARE_SIZE = Math.floor((USABLE_WIDTH - (SQUARE_GAP * 2)) / 3);
-
-
+import { Board } from '@/components/tic-tac-toe/Board';
+import { ColorPickerModal } from '@/components/tic-tac-toe/ColorPickerModal';
+import { Scoreboard } from '@/components/tic-tac-toe/Scoreboard';
+import { VictoryOverlay } from '@/components/tic-tac-toe/VictoryOverlay';
+import { GAME_CONSTANTS } from '@/constants/GameConstants';
+import { PlayerSymbol } from '@/constants/types';
+import { useTicTacToe } from '@/hooks/useTicTacToe';
 
 export default function TicTacToeScreen() {
   const packageJson = require('../../package.json');
-  const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
-  const [scores, setScores] = useState({ X: 0, O: 0, Draws: 0 });
-  const [lastWinner, setLastWinner] = useState<string | null>(null);
-  const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
-  const [showDrawOverlay, setShowDrawOverlay] = useState(false);
-  const [playerColors, setPlayerColors] = useState({ X: '#FF474D', O: '#1E90FF' });
-  const [showColorPicker, setShowColorPicker] = useState<'X' | 'O' | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [playerNames, setPlayerNames] = useState({ X: 'Player X', O: 'Player O' });
-  const [tempPlayerName, setTempPlayerName] = useState('');
-  const [, setStarter] = useState<'X' | 'O'>('X');
+  const {
+    board,
+    xIsNext,
+    scores,
+    winner,
+    winLine,
+    playerNames,
+    playerColors,
+    showWinnerOverlay,
+    showDrawOverlay,
+    toastMessage,
+    setPlayerNames,
+    setPlayerColors,
+    setShowWinnerOverlay,
+    setShowDrawOverlay,
+    setToastMessage,
+    makeMove,
+    resetGame,
+    resetScoreboard,
+  } = useTicTacToe();
 
-  const colorPalette = [
-    '#FF474D', // Red
-    '#1E90FF', // Blue
-    '#10B981', // Green
-    '#F59E0B', // Orange
-    '#8B5CF6', // Purple
-    '#EC4899', // Pink
-    '#14B8A6', // Teal
-    '#F97316', // Deep Orange
-    '#6366F1', // Indigo
-    '#EAB308', // Yellow
-    '#06B6D4', // Cyan
-    '#84CC16', // Lime
-  ];
+  const [activeColorPicker, setActiveColorPicker] = useState<PlayerSymbol | null>(null);
 
-  const boardScale = useSharedValue(1);
+  const currentPlayer = xIsNext ? 'X' : 'O';
+  const status = winner
+    ? winner === 'Draw' ? "It's a Draw!" : `${playerNames[winner as PlayerSymbol]} Wins! (${winner})`
+    : `${playerNames[currentPlayer]}'s Turn (${currentPlayer})`;
 
-  // Auto-hide toast after 2 seconds
+  // Auto-hide toast
   useEffect(() => {
     if (toastMessage) {
-      const timer = setTimeout(() => {
-        setToastMessage(null);
-      }, 2000);
+      const timer = setTimeout(() => setToastMessage(null), 2000);
       return () => clearTimeout(timer);
     }
-  }, [toastMessage]);
+  }, [toastMessage, setToastMessage]);
 
-  const calculateWinner = (squares: (string | null)[]) => {
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-      const [a, b, c] = lines[i];
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return { winner: squares[a], line: [a, b, c] };
-      }
-    }
-    if (squares.every(square => square !== null)) {
-      return { winner: 'Draw', line: null };
-    }
-    return null;
-  };
-
-  const winInfo = calculateWinner(board);
-  const winner = winInfo?.winner;
-  const winLine = winInfo?.line;
-
-  const status = winner
-    ? winner === 'Draw' ? "It's a Draw!" : `${winner} Wins!`
-    : `${xIsNext ? 'X' : 'O'}'s Turn`;
-
-  const handlePress = (index: number) => {
-    if (board[index] || winner) return;
-
-    const newBoard = [...board];
-    const currentPlayer = xIsNext ? 'X' : 'O';
-    newBoard[index] = currentPlayer;
-    setBoard(newBoard);
-
-    const nextWinInfo = calculateWinner(newBoard);
-    if (nextWinInfo) {
-      if (nextWinInfo.winner === 'Draw') {
-        setScores(s => ({ ...s, Draws: s.Draws + 1 }));
-        setLastWinner(null);
-      } else {
-        const winPlayer = nextWinInfo.winner;
-        setScores(s => ({ ...s, [winPlayer as 'X' | 'O']: s[winPlayer as 'X' | 'O'] + 1 }));
-        setLastWinner(winPlayer);
-      }
-      // Victory/Draw shake
-      boardScale.value = withSequence(
-        withSpring(1.05),
-        withSpring(1)
-      );
-    }
-
-    setXIsNext(!xIsNext);
-  };
-
-  const resetGame = useCallback(() => {
-    setBoard(Array(9).fill(null));
-    setShowWinnerOverlay(false);
-    setShowDrawOverlay(false);
-    if (lastWinner) {
-      setXIsNext(lastWinner === 'X');
-      setStarter(lastWinner as 'X' | 'O');
-    } else {
-      setStarter(prev => {
-        const nextS = prev === 'X' ? 'O' : 'X';
-        setXIsNext(nextS === 'X');
-        return nextS;
-      });
-    }
-  }, [lastWinner]);
-
+  // Handle Win/Draw overlays and auto-reset
   useEffect(() => {
     if (winner) {
-      if (winner !== 'Draw') {
-        const timer = setTimeout(() => {
-          setShowWinnerOverlay(true);
-        }, 500);
-        const resetTimer = setTimeout(() => {
-          resetGame();
-        }, 2000);
-        return () => {
-          clearTimeout(timer);
-          clearTimeout(resetTimer);
-        };
-      } else {
-        const timer = setTimeout(() => {
-          setShowDrawOverlay(true);
-        }, 500);
-        const resetTimer = setTimeout(() => {
-          resetGame();
-        }, 2000);
-        return () => {
-          clearTimeout(timer);
-          clearTimeout(resetTimer);
-        };
-      }
+      const overlayTimer = setTimeout(() => {
+        if (winner === 'Draw') setShowDrawOverlay(true);
+        else setShowWinnerOverlay(true);
+      }, GAME_CONSTANTS.OVERLAY_DELAY);
+
+      const resetTimer = setTimeout(() => {
+        resetGame();
+      }, GAME_CONSTANTS.AUTO_RESET_DELAY);
+
+      return () => {
+        clearTimeout(overlayTimer);
+        clearTimeout(resetTimer);
+      };
     }
-  }, [winner, resetGame]);
+  }, [winner, resetGame, setShowDrawOverlay, setShowWinnerOverlay]);
 
-  const resetScoreboard = () => {
-    setScores({ X: 0, O: 0, Draws: 0 });
-    setLastWinner(null);
-    setStarter('X');
-    resetGame();
-  };
+  const onSave = (name: string, color: string) => {
+    if (!activeColorPicker) return;
 
-  const boardAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: boardScale.value }]
-  }));
+    const otherPlayer = activeColorPicker === 'X' ? 'O' : 'X';
+    // Check if the color is taken by the OTHER player
+    if (playerColors[otherPlayer] === color) {
+      setToastMessage(`This color is already taken by ${playerNames[otherPlayer]}!`);
+      return; // Stop here, keep modal open
+    }
 
-  const renderSquare = (index: number) => {
-    const isWinSquare = winLine?.includes(index);
-    const value = board[index];
-
-    return (
-      <Pressable
-        key={index}
-        onPress={() => handlePress(index)}
-        style={({ pressed }) => [
-          styles.square,
-          {
-            width: SQUARE_SIZE,
-            height: SQUARE_SIZE,
-            opacity: pressed ? 0.8 : 1,
-            transform: [{ scale: pressed ? 0.95 : 1 }]
-          },
-          isWinSquare && styles.winSquare
-        ]}
-      >
-        {value === 'X' && (
-          <Animated.View entering={ZoomIn.springify()}>
-            <X
-              size={SQUARE_SIZE * 0.6}
-              color={isWinSquare ? '#FFFFFF' : playerColors.X}
-              strokeWidth={3}
-            />
-          </Animated.View>
-        )}
-        {value === 'O' && (
-          <Animated.View entering={ZoomIn.springify()}>
-            <Circle
-              size={SQUARE_SIZE * 0.55}
-              color={isWinSquare ? '#FFFFFF' : playerColors.O}
-              strokeWidth={3}
-            />
-          </Animated.View>
-        )}
-      </Pressable>
-    );
+    if (name.trim()) {
+      setPlayerNames(prev => ({ ...prev, [activeColorPicker!]: name.trim() }));
+    }
+    setPlayerColors(prev => ({ ...prev, [activeColorPicker!]: color }));
+    setActiveColorPicker(null);
   };
 
   return (
     <View style={styles.container}>
-
       <Animated.View
         entering={FadeInDown.duration(800).delay(200)}
         style={styles.content}
@@ -227,35 +96,25 @@ export default function TicTacToeScreen() {
           <ThemedText style={styles.title}>TIC TAC TOE</ThemedText>
         </View>
 
-        <View style={styles.glassScoreboard}>
-          <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('X')}>
-            <ThemedText style={[styles.scoreLabel, { color: playerColors.X }]}>{playerNames.X}</ThemedText>
-            <ThemedText style={styles.scoreNumber}>{scores.X}</ThemedText>
-          </TouchableOpacity>
-          <View style={styles.scoreDivider} />
-          <View style={styles.scoreBox}>
-            <ThemedText style={styles.scoreLabel}>DRAWS</ThemedText>
-            <ThemedText style={styles.scoreNumber}>{scores.Draws}</ThemedText>
-          </View>
-          <View style={styles.scoreDivider} />
-          <TouchableOpacity style={styles.scoreBox} onPress={() => setShowColorPicker('O')}>
-            <ThemedText style={[styles.scoreLabel, { color: playerColors.O }]}>{playerNames.O}</ThemedText>
-            <ThemedText style={styles.scoreNumber}>{scores.O}</ThemedText>
-          </TouchableOpacity>
-        </View>
+        <Scoreboard
+          scores={scores}
+          playerNames={playerNames}
+          playerColors={playerColors}
+          onPlayerPress={setActiveColorPicker}
+        />
 
         <View style={styles.statusContainer}>
           <View style={[styles.indicator, { backgroundColor: xIsNext ? playerColors.X : playerColors.O }]} />
           <ThemedText style={styles.statusText}>{status}</ThemedText>
         </View>
 
-        <Animated.View style={[styles.boardContainer, boardAnimatedStyle]}>
-          <View style={[styles.board, { width: GRID_SIZE, height: GRID_SIZE, padding: BOARD_PADDING }]}>
-            <View style={[styles.grid, { gap: SQUARE_GAP }]}>
-              {Array(9).fill(null).map((_, i) => renderSquare(i))}
-            </View>
-          </View>
-        </Animated.View>
+        <Board
+          board={board}
+          onSquarePress={makeMove}
+          winLine={winLine}
+          playerColors={playerColors}
+          winner={winner}
+        />
 
         <View style={styles.buttonRow}>
           <TouchableOpacity style={[styles.glassButton, styles.primaryButton]} onPress={resetGame}>
@@ -269,125 +128,27 @@ export default function TicTacToeScreen() {
           </TouchableOpacity>
         </View>
       </Animated.View>
+
       <ThemedText style={styles.version}>UA83v{packageJson.version}</ThemedText>
 
-      {showWinnerOverlay && winner && winner !== 'Draw' && (
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          exiting={FadeOut.duration(400)}
-          style={styles.victoryOverlay}
-        >
-          <LinearGradient
-            colors={['rgba(30, 144, 255, 0.9)', 'rgba(255, 255, 255, 0.95)']}
-            style={styles.victoryGradient}
-          >
-            <Animated.View entering={ZoomIn.delay(200).springify()}>
-              <Trophy size={120} color="#FFD700" strokeWidth={1.5} />
-            </Animated.View>
-            <ThemedText style={styles.victoryTitle}>VICTORY</ThemedText>
-            <ThemedText style={styles.victorySubtitle}>{playerNames[winner as 'X' | 'O']} DOMINATES</ThemedText>
-          </LinearGradient>
-        </Animated.View>
-      )}
+      {/* Overlays */}
+      {showWinnerOverlay && <VictoryOverlay winner={winner} playerNames={playerNames} />}
+      {showDrawOverlay && <VictoryOverlay winner="Draw" playerNames={playerNames} />}
 
-      {showDrawOverlay && winner === 'Draw' && (
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          exiting={FadeOut.duration(400)}
-          style={styles.victoryOverlay}
-        >
-          <LinearGradient
-            colors={['rgba(100, 116, 139, 0.9)', 'rgba(255, 255, 255, 0.95)']}
-            style={styles.victoryGradient}
-          >
-            <Animated.View entering={ZoomIn.delay(200).springify()}>
-              <Handshake size={120} color="#64748B" strokeWidth={1.5} />
-            </Animated.View>
-            <ThemedText style={styles.drawTitle}>DRAW</ThemedText>
-            <ThemedText style={styles.drawSubtitle}>EVENLY MATCHED</ThemedText>
-          </LinearGradient>
-        </Animated.View>
-      )}
+      {/* Modals */}
+      <ColorPickerModal
+        visible={activeColorPicker !== null}
+        player={activeColorPicker}
+        playerNames={playerNames}
+        playerColors={playerColors}
+        onClose={() => setActiveColorPicker(null)}
+        onSave={onSave}
+        toastMessage={toastMessage}
+        onColorSelect={(color: string, name: string) => onSave(name, color)}
+      />
 
-      {/* Color Picker Modal */}
-      <Modal
-        visible={showColorPicker !== null}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowColorPicker(null)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowColorPicker(null)}
-        >
-          <Pressable style={styles.colorPickerContainer} onPress={(e) => e.stopPropagation()}>
-            <ThemedText style={styles.colorPickerTitle}>
-              Customize Player {showColorPicker}
-            </ThemedText>
-
-            {/* Name Input */}
-            <View style={styles.nameInputContainer}>
-              <ThemedText style={styles.inputLabel}>Player Name:</ThemedText>
-              <TextInput
-                style={styles.nameInput}
-                value={tempPlayerName}
-                onChangeText={setTempPlayerName}
-                placeholder={playerNames[showColorPicker as 'X' | 'O']}
-                placeholderTextColor="#94A3B8"
-                maxLength={15}
-              />
-            </View>
-
-            {/* Color Selection */}
-            <ThemedText style={styles.inputLabel}>Choose Color:</ThemedText>
-            <View style={styles.colorGrid}>
-              {colorPalette.map((color) => {
-                const otherPlayer = showColorPicker === 'X' ? 'O' : 'X';
-                const isColorTaken = playerColors[otherPlayer] === color;
-                const isSelected = playerColors[showColorPicker as 'X' | 'O'] === color;
-
-                return (
-                  <TouchableOpacity
-                    key={color}
-                    style={[
-                      styles.colorOption,
-                      { backgroundColor: color },
-                      isSelected && styles.selectedColor,
-                      isColorTaken && styles.disabledColor,
-                    ]}
-                    onPress={() => {
-                      if (showColorPicker) {
-                        if (isColorTaken) {
-                          const otherPlayerName = showColorPicker === 'X' ? 'O' : 'X';
-                          setToastMessage(`This color is already taken by ${playerNames[otherPlayerName]}!`);
-                        } else {
-                          setPlayerColors(prev => ({ ...prev, [showColorPicker]: color }));
-                          if (tempPlayerName.trim()) {
-                            setPlayerNames(prev => ({ ...prev, [showColorPicker]: tempPlayerName.trim() }));
-                          }
-                          setTempPlayerName('');
-                          setShowColorPicker(null);
-                        }
-                      }
-                    }}
-                    disabled={false}
-                  >
-                    {isSelected && (
-                      <View style={styles.checkmark} />
-                    )}
-                    {isColorTaken && (
-                      <View style={styles.disabledOverlay} />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-
-      {/* Toast Notification */}
-      {toastMessage && (
+      {/* Universal Toast */}
+      {toastMessage && activeColorPicker === null && (
         <Animated.View
           entering={FadeInDown.duration(300)}
           exiting={FadeOut.duration(300)}
@@ -396,7 +157,6 @@ export default function TicTacToeScreen() {
           <ThemedText style={styles.toastText}>{toastMessage}</ThemedText>
         </Animated.View>
       )}
-
     </View>
   );
 }
@@ -414,50 +174,16 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 15,
-    marginTop: 60, // Force move on Android
+    marginTop: 60,
   },
   title: {
     fontSize: 42,
     fontWeight: '900',
     color: '#0F172A',
     letterSpacing: 8,
-    fontFamily: 'Ubuntu_700Bold',
     lineHeight: 52,
     paddingVertical: 10,
     textAlign: 'center',
-  },
-  glassScoreboard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF', // Solid opaque white for Android/Web consistency
-    borderRadius: 5,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#E2E8F0', // Solid light border
-    width: GRID_SIZE,
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  scoreBox: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  scoreLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#94A3B8',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  scoreNumber: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  scoreDivider: {
-    width: 1,
-    height: '60%',
-    backgroundColor: '#E2E8F0', // Visible divider
-    alignSelf: 'center',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -469,16 +195,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    width: GRID_SIZE,
+    width: GAME_CONSTANTS.GRID_SIZE,
   },
   indicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
     marginRight: 10,
-    shadowColor: '#FFF',
-    shadowRadius: 10,
-    shadowOpacity: 0.5,
   },
   statusText: {
     fontSize: 13,
@@ -487,79 +210,26 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
-  boardContainer: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  board: {
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignContent: 'center',
-  },
-  square: {
-    backgroundColor: '#FFFFFF', // Solid white so they all look the same
-    borderRadius: 5,          // Rounded corners for the "Next Gen" look
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 80,                 // Ensure fixed dimensions
-    height: 80,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',    // Suble but visible border
-  },
-  winSquare: {
-    backgroundColor: '#1E90FF',
-    borderColor: '#38BDF8',
-    elevation: 10,
-    shadowColor: '#1E90FF',
-    shadowRadius: 20,
-    shadowOpacity: 0.5,
-  },
   buttonRow: {
     flexDirection: 'row',
     marginTop: 25,
     gap: 16,
-    width: GRID_SIZE,
+    width: GAME_CONSTANTS.GRID_SIZE,
   },
   glassButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Brighter opacity
     height: 56,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
     elevation: 2,
   },
   primaryButton: {
     backgroundColor: '#1E90FF',
     borderColor: '#1E90FF',
-    shadowColor: '#1E90FF',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 4,
   },
   primaryButtonText: {
     fontSize: 14,
@@ -570,68 +240,12 @@ const styles = StyleSheet.create({
   dangerButton: {
     backgroundColor: '#FF474D',
     borderColor: '#FF474D',
-    shadowColor: '#FF474D',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0F172A',
-    letterSpacing: 1.2,
   },
   dangerButtonText: {
     fontSize: 14,
     fontWeight: '800',
     color: '#FFF',
     letterSpacing: 1.2,
-  },
-  victoryOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1000,
-  },
-  victoryGradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  victoryTitle: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: '#0F172A', // High contrast color
-    letterSpacing: 8,
-    fontFamily: 'Ubuntu_700Bold',
-    marginTop: 20,
-    lineHeight: 60,
-    paddingVertical: 10,
-    textAlign: 'center',
-  },
-  victorySubtitle: {
-    fontSize: 16,
-    color: '#FFD700',
-    fontWeight: '700',
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-  },
-  drawTitle: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: '#0F172A',
-    letterSpacing: 8,
-    fontFamily: 'Ubuntu_700Bold',
-    marginTop: 20,
-    lineHeight: 60,
-    paddingVertical: 10,
-    textAlign: 'center',
-  },
-  drawSubtitle: {
-    fontSize: 16,
-    color: '#64748B',
-    fontWeight: '700',
-    letterSpacing: 4,
-    textTransform: 'uppercase',
   },
   version: {
     position: 'absolute',
@@ -642,69 +256,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  colorPickerContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
-    width: '85%',
-    maxWidth: 400,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  colorPickerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0F172A',
-    textAlign: 'center',
-    marginBottom: 20,
-    fontFamily: 'Ubuntu_700Bold',
-  },
-  colorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  colorOption: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'transparent',
-  },
-  selectedColor: {
-    borderColor: '#0F172A',
-    borderWidth: 4,
-  },
-  checkmark: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderWidth: 2,
-    borderColor: '#0F172A',
-  },
-  disabledColor: {
-    opacity: 0.4,
-  },
-  disabledOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   toast: {
     position: 'absolute',
     bottom: 100,
@@ -713,10 +264,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 12,
-    shadowColor: '#361e1eff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
     elevation: 8,
     zIndex: 2000,
   },
@@ -725,25 +272,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  nameInputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0F172A',
-    marginBottom: 8,
-  },
-  nameInput: {
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#0F172A',
-    fontWeight: '500',
   },
 });
