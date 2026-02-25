@@ -12,7 +12,7 @@ A modern, high-performance Tic-Tac-Toe game built with **React Native** and **Ex
 - **Haptic Feedback**: High-quality vibrations for moves and celebrations (can be toggled on/off).
 - **Fully Responsive**: Optimized for all screen sizes, from small phones to large tablets.
 
-## 🚀 Getting Started
+## 🚀 Getting Started 1
 
 ### Prerequisites
 
