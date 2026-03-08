@@ -14,7 +14,7 @@ A modern, high-performance Tic-Tac-Toe game built with **React Native** and **Ex
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Prerequisites.
 
 - [Node.js](https://nodejs.org/) (LTS)
 - [Expo Go](https://expo.dev/go) app on your device (for testing)
